@@ -1,0 +1,12 @@
+name: Label size of PRs 
+on: pull_request
+jobs:
+  size-label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: size-label
+        uses: "pascalgn/size-label-action@cdbe57c421bcd58ecfb528fa36325faf11e032a9"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          IGNORED: ".*\npackage-lock.json\ndist/**"
+
