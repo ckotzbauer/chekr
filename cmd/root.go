@@ -3,13 +3,15 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/ckotzbauer/chekr/pkg/kubernetes"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 var (
-	cfgFile     string
-	userLicense string
+	cfgFile   string
+	overrides *clientcmd.ConfigOverrides
 
 	rootCmd = &cobra.Command{
 		Use:   "chekr",
@@ -45,6 +47,8 @@ func init() {
 
 	rootCmd.PersistentFlags().StringP("output", "o", "table", "Output-Format. Valid values are [table, json, html]")
 	rootCmd.PersistentFlags().StringP("output-file", "", "", "File to write to output to.")
+
+	overrides = kubernetes.BindFlags(rootCmd.PersistentFlags())
 
 	//rootCmd.AddCommand(addCmd)
 	//rootCmd.AddCommand(initCmd)

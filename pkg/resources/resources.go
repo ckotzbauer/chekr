@@ -23,8 +23,8 @@ func (r Resource) Execute() (printer.PrintableList, error) {
 
 	var pods []corev1.Pod
 
-	if len(r.Pods) > 0 {
-		pods = r.KubeClient.GetNamedPods(r.Namespace, r.Pods)
+	if r.Selector == "" {
+		pods = r.KubeClient.GetNamespacedPods(r.Namespace, r.Pods)
 	} else if r.Selector != "" {
 		pods = r.KubeClient.ListPods(r.Namespace, r.Selector)
 	}

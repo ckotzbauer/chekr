@@ -10,23 +10,12 @@ import (
 	"github.com/ckotzbauer/chekr/pkg/resources"
 	"github.com/prometheus/common/config"
 	"github.com/spf13/cobra"
-	"k8s.io/client-go/tools/clientcmd"
 )
-
-var overrides *clientcmd.ConfigOverrides
 
 // resourcesCmd represents the resources command
 var resourcesCmd = &cobra.Command{
 	Use:   "resources",
 	Short: "Analyze resource requests and limits of pods.",
-	Args: func(cmd *cobra.Command, args []string) error {
-		labelSelector, _ := cmd.Flags().GetString("selector")
-		if labelSelector == "" && len(args) < 1 {
-			return fmt.Errorf("Pod argument missing. Otherwise use selector flag")
-		}
-
-		return nil
-	},
 	Run: func(cmd *cobra.Command, args []string) {
 		url, _ := cmd.Flags().GetString("prometheus-url")
 		username, _ := cmd.Flags().GetString("prometheus-username")
@@ -74,6 +63,4 @@ func init() {
 
 	resourcesCmd.Flags().StringP("selector", "l", "", "Label-Selector")
 	// Output
-
-	overrides = kubernetes.BindFlags(resourcesCmd.Root().PersistentFlags())
 }
