@@ -62,5 +62,6 @@ func init() {
 	resourcesCmd.Flags().DurationP("timeout", "t", time.Duration(30)*time.Second, "Timeout")
 
 	resourcesCmd.Flags().StringP("selector", "l", "", "Label-Selector")
-	// Output
+
+	resourcesCmd.MarkFlagRequired("prometheus-url")
 }
