@@ -56,6 +56,7 @@ func (p PodValuesList) ToTable() (string, error) {
 	table.SetAlignment(tablewriter.ALIGN_LEFT)
 
 	table.SetHeader([]string{
+		"Namespace",
 		"Pod",
 		"Memory Requests",
 		"Memory Limits",
@@ -65,6 +66,7 @@ func (p PodValuesList) ToTable() (string, error) {
 
 	for _, v := range p.Items {
 		table.Append([]string{
+			v.Namespace,
 			v.Pod,
 			v.MemoryRequests.Min.FormatMemory() + "\n" + v.MemoryRequests.Avg.FormatMemory() + "\n" + v.MemoryRequests.Max.FormatMemory(),
 			v.MemoryLimits.Min.FormatMemory() + "\n" + v.MemoryLimits.Avg.FormatMemory() + "\n" + v.MemoryLimits.Max.FormatMemory(),

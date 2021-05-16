@@ -10,6 +10,22 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
+var description = `
+
+Ranks
+0: Undefined (detection was not possible)
+1: High-available (failure-resilient, zero-downtime-deployment capable)
+2: Zero-downtime-deployment capable: (non failure-resilient)
+3: Single-point-of-failure
+4: Standalone pod
+
+Definitions
+Failure resilient: If a single pod or node crashes, the availability of the workload is not affected.
+Zero-downtime-deployment: The workload can be updated without downtime
+Single-point-of-failure: If a single pod or the node crashes, the availability of the workload is degraded.
+Standalone pod: If the pod is removed or crashes, it disappears without replacement.
+`
+
 type HighAvailability struct {
 	KubeOverrides *clientcmd.ConfigOverrides
 	KubeClient    *kubernetes.KubeClient
@@ -40,7 +56,7 @@ func (p PodAvailabilityList) ToJson() (string, error) {
 }
 
 func (p PodAvailabilityList) ToHtml() (string, error) {
-	return printer.ToHtml(HtmlPage, p)
+	return printer.ToHtml(fmt.Sprintf(HtmlPage, description), p)
 }
 
 func (p PodAvailabilityList) ToTable() (string, error) {
@@ -51,6 +67,7 @@ func (p PodAvailabilityList) ToTable() (string, error) {
 	table.SetAlignment(tablewriter.ALIGN_LEFT)
 
 	table.SetHeader([]string{
+		"Namespace",
 		"Name",
 		"Type",
 		"Replicas",
@@ -62,6 +79,7 @@ func (p PodAvailabilityList) ToTable() (string, error) {
 
 	for _, v := range p.Items {
 		table.Append([]string{
+			v.Namespace,
 			v.Name,
 			v.Type,
 			fmt.Sprint(v.Replicas),
@@ -73,5 +91,6 @@ func (p PodAvailabilityList) ToTable() (string, error) {
 	}
 
 	table.Render()
-	return buf.String(), nil
+	content := buf.String()
+	return fmt.Sprintf("%s %s", content, description), nil
 }

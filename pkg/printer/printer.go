@@ -58,5 +58,6 @@ func ToHtml(html string, v interface{}) (string, error) {
 	}
 
 	err = tpl.Execute(buf, v)
-	return buf.String(), err
+	content := buf.String()
+	return fmt.Sprintf(HtmlContainer, content), err
 }
