@@ -38,7 +38,7 @@ Chekr tries to be as most compatible to `kubectl` as possible. Most of the globa
 to give the user full control. By default, the local `kubeconfig` is used or the respective `ServiceAccount` credentials, if a cluster environment
 is detected. By default the namespace of the `kubeconfig context` is used for the request.
 
-## Global flags
+### Global flags
 
 ```
     --as string                      Username to impersonate for the operation
