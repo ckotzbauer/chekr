@@ -29,7 +29,7 @@ Chekr is a cli-tool to handle some common cases of ongoing maintenance tasks whe
 
 ### Download binary
 
-Download the binary for your platform from the [release page](https://github.com/ckotzbauer/chekr/releases) and store it on your machine.
+Download the latest binary for your platform from the [release page](https://github.com/ckotzbauer/chekr/releases) and store it on your machine.
 
 
 ## Usage
