@@ -13,7 +13,7 @@ Chekr is a cli-tool to handle some common cases of ongoing maintenance tasks whe
 * Generate a resource-usage overview by querying Prometheus metrics and compare them with the requests and limits beeing set.
 * Output as table, json or html.
 * Bash completions (Bash, Zsh, Fish, PowerShell)
-... see the [Roadmap][#Roadmap]
+* ... see the Roadmap
 
 
 ## Compatibility
