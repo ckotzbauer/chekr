@@ -27,7 +27,8 @@ var (
 )
 
 // Execute executes the root command.
-func Execute() error {
+func Execute(version, commit, date, builtBy string) error {
+	rootCmd.AddCommand(NewVersionCmd(version, commit, date, builtBy))
 	return rootCmd.Execute()
 }
 

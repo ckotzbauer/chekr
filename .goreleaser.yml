@@ -1,0 +1,27 @@
+before:
+  hooks:
+    - go mod tidy
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarm:
+      - 6
+      - 7
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}} -X main.builtBy=goreleaser
+archives:
+  - replacements:
+      386: i386
+    format_overrides:
+      - goos: windows
+        format: zip
+snapshot:
+  name_template: "{{ .Version }}-next"
+release:
+  disable: true
+changelog:
+  skip: true
