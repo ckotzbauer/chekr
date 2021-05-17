@@ -1,3 +1,10 @@
+## Version 0.1.0-alpha.2 (2021-05-17)
+
+### Features and improvements
+
+* [[`ac12c7c4`](https://github.com/ckotzbauer&#x2F;chekr/commit/ac12c7c4)] - **feat**: add dockerimage
+
+
 ## Version 0.1.0-alpha.1 (2021-05-16)
 
 ### Features and improvements
