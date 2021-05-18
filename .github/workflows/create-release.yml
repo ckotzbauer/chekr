@@ -68,6 +68,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: |
             ckotzbauer/chekr:${{ github.event.inputs.version }}
+            ghcr.io/ckotzbauer/chekr:${{ github.event.inputs.version }}
 
       - name: Generate changelog
         run: npx @code-chris/changelog-generator --release-version ${{ github.event.inputs.version }} --github-handle ${{ github.repository }} --commit-output commits.md
