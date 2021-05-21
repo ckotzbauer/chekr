@@ -1,4 +1,4 @@
-name: update-snyk
+name: update-k8s-deprecations
 
 on:
   schedule:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch: {}
 
 jobs:
-  update-snyk:
+  update-k8s-deprecations:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
