@@ -15,15 +15,15 @@ jobs:
         with:
           go-version: '1.16'
 
-      - name: Generate
-        run: make generate_k8s_deprecations
-
       - uses: actions/checkout@v2
         name: Checkout kubernetes/api
         with:
           repository: kubernetes/api
           ref: master
           path: tools/api-lifecycle-gen/api-repo
+
+      - name: Generate
+        run: make generate_k8s_deprecations
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
