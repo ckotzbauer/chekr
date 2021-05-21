@@ -1162,6 +1162,17 @@
           "version": "v1",
           "name": "CSINode"
         }
+      },
+      {
+        "name": "CSINodeList",
+        "introduced": "1.14",
+        "deprecated": "1.17",
+        "removed": "1.22",
+        "replacement": {
+          "group": "storage.k8s.io",
+          "version": "v1",
+          "name": "CSINode"
+        }
       }
     ]
   }
