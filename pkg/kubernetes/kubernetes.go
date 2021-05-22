@@ -2,10 +2,13 @@ package kubernetes
 
 import (
 	"context"
+	"log"
+	"strings"
 
 	"github.com/spf13/pflag"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -14,6 +17,7 @@ import (
 
 type KubeClient struct {
 	Client *kubernetes.Clientset
+	Config *rest.Config
 }
 
 func IsInCluster() bool {
@@ -46,7 +50,7 @@ func NewClient(configOverrides *clientcmd.ConfigOverrides) *KubeClient {
 		panic(err.Error())
 	}
 
-	return &KubeClient{Client: client}
+	return &KubeClient{Client: client, Config: config}
 }
 
 func (kubeClient *KubeClient) ListPods(namespace, labelSelector string) []corev1.Pod {
@@ -112,4 +116,67 @@ func (kubeClient *KubeClient) GetStatefulSet(namespace string, name string) (*ap
 
 func (kubeClient *KubeClient) GetPersistentVolumeClaim(namespace string, name string) (*corev1.PersistentVolumeClaim, error) {
 	return kubeClient.Client.CoreV1().PersistentVolumeClaims(namespace).Get(context.Background(), name, metav1.GetOptions{})
+}
+
+func (kubeClient *KubeClient) DiscoverResourceNameAndPreferredGV() KindVersions {
+	kv := make(KindVersions)
+	groups, resources, err := kubeClient.Client.DiscoveryClient.ServerGroupsAndResources()
+
+	if err != nil {
+		if apierrors.IsNotFound(err) {
+			return kv
+		}
+
+		if apierrors.IsForbidden(err) {
+			log.Fatalf("Failed to list objects for Name discovery. Permission denied! Please check if you have the proper authorization")
+		}
+
+		log.Fatalf("Failed communicating with k8s while discovering the object preferred name and gv. Error: %v", err)
+	}
+
+	for _, resourceGroup := range resources {
+		parts := strings.Split(resourceGroup.GroupVersion, "/")
+		var group, version string
+
+		if len(parts) == 1 {
+			group = ""
+			version = parts[0]
+		} else {
+			group = parts[0]
+			version = parts[1]
+		}
+
+		for _, resource := range resourceGroup.APIResources {
+			if strings.Contains(resource.Name, "/") {
+				continue
+			}
+
+			kindVersion := KindVersion{
+				Group:     group,
+				Version:   version,
+				Name:      resource.Name,
+				Preferred: isVersionPreferred(group, version, groups),
+			}
+
+			if _, ok := kv[resource.Kind]; !ok {
+				kv[resource.Kind] = []KindVersion{kindVersion}
+			} else {
+				kv[resource.Kind] = append(kv[resource.Kind], kindVersion)
+			}
+		}
+	}
+
+	return kv
+}
+
+func isVersionPreferred(group, currentVersion string, allGroups []*metav1.APIGroup) bool {
+	for _, supportedGroup := range allGroups {
+		if supportedGroup.Name != group {
+			continue
+		}
+
+		return supportedGroup.PreferredVersion.Version == currentVersion
+	}
+
+	return false
 }
