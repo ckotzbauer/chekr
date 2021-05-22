@@ -13,7 +13,7 @@ require (
 	golang.org/x/text v0.3.5 // indirect
 	k8s.io/api v0.21.1
 	k8s.io/apimachinery v0.21.1
-	k8s.io/client-go v0.21.1
+	k8s.io/client-go/v12 v12.0.0
 )
 
 replace github.com/ddelizia/channelify => github.com/ckotzbauer/channelify v0.0.2-0.20210225173251-a871a15779a0
