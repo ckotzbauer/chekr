@@ -34,7 +34,7 @@ jobs:
           push: false
           platforms: linux/amd64,linux/arm64
           tags: |
-            ckotzbauer/chekr:${{ github.event.inputs.version }}
+            ckotzbauer/chekr:latest
 
       - name: Container scan
         uses: azure/container-scan@v0
