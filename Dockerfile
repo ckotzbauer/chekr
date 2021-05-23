@@ -3,7 +3,10 @@ FROM alpine:3.13
 ARG TARGETOS
 ARG TARGETARCH
 
-WORKDIR /app
-COPY dist/chekr_${TARGETOS}_${TARGETARCH}/chekr .
+RUN addgroup -g 1000 chekr && \
+    adduser -u 1000 -G chekr -s /bin/sh -D chekr
 
-ENTRYPOINT ["/app/chekr"]
+COPY dist/chekr_${TARGETOS}_${TARGETARCH}/chekr /usr/local/bin/chekr
+
+ENTRYPOINT ["/usr/local/bin/chekr"]
+USER chekr

@@ -37,6 +37,11 @@ Download the latest binary for your platform from the [release page](https://git
 ```
 docker pull ckotzbauer/chekr:latest
 docker pull ghcr.io/ckotzbauer/chekr:latest
+
+docker run --rm \
+    -v ~/.kube/config:/home/chekr/.kube/config:ro \
+    ckotzbauer/chekr:latest \
+    deprecation
 ```
 
 
