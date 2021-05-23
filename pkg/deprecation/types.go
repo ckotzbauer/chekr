@@ -59,8 +59,7 @@ func (p DeprecatedResourceList) ToJson() (string, error) {
 }
 
 func (p DeprecatedResourceList) ToHtml() (string, error) {
-	//return printer.ToHtml(HtmlPage, p)
-	return "", nil
+	return printer.ToHtml(HtmlPage, p)
 }
 
 func (p DeprecatedResourceList) ToTable() (string, error) {
