@@ -80,7 +80,7 @@ This feature generates a report of all pods about their resiliency according the
 To change the default namespace use global `-n` flag. You can filter by pod-selectors with `-l`. All Pods are categorized by multiple factors:
 * Type (Deployment, Statefulset, DaemonSet, Job, CRD, standalone)
 * Replica count
-* Deployment- / Updatestrategy
+* Deploymentstrategy / Updatestrategy
 * PVCs (ROX, RWO, RWX)
 * Pod-Anti-Affinity
 
@@ -91,7 +91,7 @@ The pods are ranked with the following categories:
 * **3**: single-point-of-failure
 * **4**: standalone pod
 
-**Note:** This only checks common settins which are usually responsible for failure- and deployment-behaviors in a default Kubernetes environment. This
+**Note:** This only checks common settings which are usually responsible for failure- and deployment-behaviors in a default Kubernetes environment. This
 cannot detect special Kubernetes configurations/addons or the application behavior itself in the pod!
 
 ```
@@ -137,7 +137,7 @@ of objects which are deprecated and will be removed in a future version. You can
 version you can specify `-V`. This will hide all items, which are deprecated in a never version than specified. Increase the burst with `-t` to bypass throttling
 from the Kubernetes server.
 
-**Note:**: This command always scans all namespaces and cannot be filtered with the global `-n` flag.
+**Note:** This command always scans all namespaces and cannot be filtered with the global `-n` flag.
 
 ```
 List deprected objects in your cluster.
