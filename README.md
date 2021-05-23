@@ -138,6 +138,7 @@ version you can specify `-V`. This will hide all items, which are deprecated in 
 from the Kubernetes server.
 
 **Note:** This command always scans all namespaces and cannot be filtered with the global `-n` flag.
+This feature was inspired by https://github.com/rikatz/kubepug.
 
 ```
 List deprected objects in your cluster.
