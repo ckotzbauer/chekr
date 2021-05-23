@@ -11,9 +11,9 @@ Chekr is a cli-tool to handle some common cases of ongoing maintenance tasks whe
 
 * Generate a high-availability report of your workload depending on your configurations.
 * Generate a resource-usage overview by querying Prometheus metrics and compare them with the requests and limits beeing set.
+* List deprecated API obbjects
 * Output as table, json or html.
 * Bash completions (Bash, Zsh, Fish, PowerShell)
-* ... see the Roadmap
 
 
 ## Compatibility
@@ -30,6 +30,14 @@ Chekr is a cli-tool to handle some common cases of ongoing maintenance tasks whe
 ### Download binary
 
 Download the latest binary for your platform from the [release page](https://github.com/ckotzbauer/chekr/releases) and store it on your machine.
+
+
+### Docker
+
+```
+docker pull ckotzbauer/chekr:latest
+docker pull ghcr.io/ckotzbauer/chekr:latest
+```
 
 
 ## Usage
@@ -92,9 +100,20 @@ Flags:
   -t, --timeout duration             Timeout (default 30s)
 ```
 
-## Roadmap
+### Deprecated API objects
 
-* List the usage of deprecated api objects.
+```
+List deprected objects in your cluster.
+
+Usage:
+  chekr deprecation [flags]
+
+Flags:
+  -h, --help                    help for deprecation
+  -i, --ignored-kinds strings   All kinds you want to ignore (e.g. Deployment,DaemonSet)
+  -V, --k8s-version string      Highest K8s major.minor version to show deprecations for (e.g. 1.21)
+  -t, --throttle-burst int      Burst used for throttling of Kubernetes discovery-client (default 100
+```
 
 
 [Contributing](https://github.com/ckotzbauer/chekr/blob/master/CONTRIBUTING.md)
