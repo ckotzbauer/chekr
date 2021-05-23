@@ -72,14 +72,6 @@ jobs:
             ghcr.io/ckotzbauer/chekr:${{ github.event.inputs.version }}
             ghcr.io/ckotzbauer/chekr:latest
 
-      - name: Sync Dockerhub Readme
-        uses: ms-jpq/sync-dockerhub-readme@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-          repository: ckotzbauer/chekr
-          readme: "./README.md"
-
       - name: Generate changelog
         run: npx @code-chris/changelog-generator --release-version ${{ github.event.inputs.version }} --github-handle ${{ github.repository }} --commit-output commits.md
 
