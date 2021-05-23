@@ -46,8 +46,3 @@ jobs:
           platforms: linux/amd64
           tags: |
             ckotzbauer/chekr:latest
-
-      - name: Container scan
-        uses: azure/container-scan@v0
-        with:
-          image-name: ckotzbauer/chekr
