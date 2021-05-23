@@ -1,3 +1,27 @@
+## Version 0.1.0 (2021-05-23)
+
+### Build and testing
+
+* [[`436a0998`](https://github.com/ckotzbauer&#x2F;chekr/commit/436a0998)] - **build**: remove readme sync
+* [[`1872ef6e`](https://github.com/ckotzbauer&#x2F;chekr/commit/1872ef6e)] - **build**: remove containerscan for now
+* [[`42faffb2`](https://github.com/ckotzbauer&#x2F;chekr/commit/42faffb2)] - **build**: several docker improvements
+* [[`d6ddfc1a`](https://github.com/ckotzbauer&#x2F;chekr/commit/d6ddfc1a)] - **build**: only test amd64
+* [[`c2721aad`](https://github.com/ckotzbauer&#x2F;chekr/commit/c2721aad)] - **build**: setup qemu and buildx
+* [[`510a2e9f`](https://github.com/ckotzbauer&#x2F;chekr/commit/510a2e9f)] - **build**: use latest
+* [[`0c72becc`](https://github.com/ckotzbauer&#x2F;chekr/commit/0c72becc)] - **build**: tag to latest on release
+* [[`34a63d4b`](https://github.com/ckotzbauer&#x2F;chekr/commit/34a63d4b)] - **build**: test image-build
+
+### Documentation
+
+* [[`7f1480e4`](https://github.com/ckotzbauer&#x2F;chekr/commit/7f1480e4)] - **doc**: add https:&#x2F;&#x2F;github.com&#x2F;rikatz&#x2F;kubepug
+* [[`3dd5e51d`](https://github.com/ckotzbauer&#x2F;chekr/commit/3dd5e51d)] - **doc**: small fixes
+* [[`653fdb5f`](https://github.com/ckotzbauer&#x2F;chekr/commit/653fdb5f)] - **doc**: updated docs
+
+### Common changes
+
+* [[`f542156c`](https://github.com/ckotzbauer&#x2F;chekr/commit/f542156c)] - **security**: add container scan
+
+
 ## Version 0.1.0-alpha.3 (2021-05-23)
 
 ### Features and improvements
