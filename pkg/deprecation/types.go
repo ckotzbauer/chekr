@@ -15,6 +15,7 @@ type Deprecation struct {
 	Namespace     string
 	K8sVersion    string
 	IgnoredKinds  []string
+	ThrottleBurst int
 }
 
 type GroupVersion struct {
