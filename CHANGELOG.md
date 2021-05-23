@@ -1,3 +1,36 @@
+## Version 0.1.0-alpha.3 (2021-05-23)
+
+### Features and improvements
+
+* [[`2265b5d1`](https://github.com/ckotzbauer&#x2F;chekr/commit/2265b5d1)] - **feat**: Add deprecation feature (#28)
+* [[`cbf41439`](https://github.com/ckotzbauer&#x2F;chekr/commit/cbf41439)] - **feat**: Updated Kubernetes deprecations
+* [[`6a057de6`](https://github.com/ckotzbauer&#x2F;chekr/commit/6a057de6)] - **feat**: add generated k8s deprecations
+* [[`744ccf33`](https://github.com/ckotzbauer&#x2F;chekr/commit/744ccf33)] - **feat**: add api-lifecycle-gen tool
+* [[`c493fe55`](https://github.com/ckotzbauer&#x2F;chekr/commit/c493fe55)] - **feat**: add ghcr.io too
+
+### Bug fixes
+
+* [[`8e1a30b5`](https://github.com/ckotzbauer&#x2F;chekr/commit/8e1a30b5)] - **fix**: use pat
+
+### Build and testing
+
+* [[`9e7b7472`](https://github.com/ckotzbauer&#x2F;chekr/commit/9e7b7472)] - **build**: add approved-label
+* [[`0f6ea975`](https://github.com/ckotzbauer&#x2F;chekr/commit/0f6ea975)] - **build**: use default github token
+* [[`4fabac00`](https://github.com/ckotzbauer&#x2F;chekr/commit/4fabac00)] - **build**: switch order
+* [[`e03aed38`](https://github.com/ckotzbauer&#x2F;chekr/commit/e03aed38)] - **build**: checkout api-repo
+* [[`3e611809`](https://github.com/ckotzbauer&#x2F;chekr/commit/3e611809)] - **build**: fix name
+* [[`2fcc6aed`](https://github.com/ckotzbauer&#x2F;chekr/commit/2fcc6aed)] - **build**: automate k8s-deprecation generation
+
+### Dependency updates
+
+* [[`0b6d5abe`](https://github.com/ckotzbauer&#x2F;chekr/commit/0b6d5abe)] - **deps**: update module k8s.io&#x2F;client-go to v0.21.1 (#26)
+* [[`a823a2cb`](https://github.com/ckotzbauer&#x2F;chekr/commit/a823a2cb)] - **deps**: update module github.com&#x2F;prometheus&#x2F;common to v0.25.0 (#27)
+
+### Common changes
+
+* [[`c63e5578`](https://github.com/ckotzbauer&#x2F;chekr/commit/c63e5578)] - **chore**: reconfigure renovate
+
+
 ## Version 0.1.0-alpha.2 (2021-05-17)
 
 ### Features and improvements
