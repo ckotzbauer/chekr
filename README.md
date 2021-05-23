@@ -76,6 +76,24 @@ is detected. By default the namespace of the `kubeconfig context` is used for th
 
 ### High-availability
 
+This feature generates a report of all pods about their resiliency according their configuration.
+To change the default namespace use global `-n` flag. You can filter by pod-selectors with `-l`. All Pods are categorized by multiple factors:
+* Type (Deployment, Statefulset, DaemonSet, Job, CRD, standalone)
+* Replica count
+* Deployment- / Updatestrategy
+* PVCs (ROX, RWO, RWX)
+* Pod-Anti-Affinity
+
+The pods are ranked with the following categories:
+* **0**: undefinied ranking
+* **1**: high-available (failure-resilient, zero-downtime-deployment capable)
+* **2**: zero-downtime-deployment capable (non failure-resilient)
+* **3**: single-point-of-failure
+* **4**: standalone pod
+
+**Note:** This only checks common settins which are usually responsible for failure- and deployment-behaviors in a default Kubernetes environment. This
+cannot detect special Kubernetes configurations/addons or the application behavior itself in the pod!
+
 ```
 Creates high-availability report of your workload.
 
@@ -89,6 +107,13 @@ Flags:
 ```
 
 ### Resource usage
+
+To generate a report about the resource-consumption from pods you can use this subcommand. It queries the given Prometheus server
+(`--prometheus-url` is mandatory) and compares the `Requests`, `Limits` and `Usage` metrics for memory and cpu of the last **30 days**.
+To change the default namespace use global `-n` flag. You can filter by pod-selectors with `-l`. The `--timeout` duration applies to the
+Prometheus client.
+
+[See used prometheus metrics](https://github.com/ckotzbauer/chekr/blob/master/pkg/resources/metrics.go)
 
 ```
 Analyze resource requests and limits of pods.
@@ -107,6 +132,13 @@ Flags:
 
 ### Deprecated API objects
 
+To get an overview of api-objects in your cluster which are deprecated you can use this feature. It scans all objects and gives you a list
+of objects which are deprecated and will be removed in a future version. You can ignore kinds with `-i`. To only view deprecations until a given
+version you can specify `-V`. This will hide all items, which are deprecated in a never version than specified. Increase the burst with `-t` to bypass throttling
+from the Kubernetes server.
+
+**Note:**: This command always scans all namespaces and cannot be filtered with the global `-n` flag.
+
 ```
 List deprected objects in your cluster.
 
@@ -117,7 +149,7 @@ Flags:
   -h, --help                    help for deprecation
   -i, --ignored-kinds strings   All kinds you want to ignore (e.g. Deployment,DaemonSet)
   -V, --k8s-version string      Highest K8s major.minor version to show deprecations for (e.g. 1.21)
-  -t, --throttle-burst int      Burst used for throttling of Kubernetes discovery-client (default 100
+  -t, --throttle-burst int      Burst used for throttling of Kubernetes discovery-client (default 100)
 ```
 
 
