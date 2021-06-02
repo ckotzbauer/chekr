@@ -20,7 +20,7 @@ archives:
       - goos: windows
         format: zip
 snapshot:
-  name_template: "{{ .Version }}-next"
+  name_template: "{{ .Version }}"
 release:
   disable: true
 changelog:
