@@ -194,7 +194,11 @@ func (d Deprecation) analyzeDeprecatedResource(
 
 func (d Deprecation) isVersionIgnored(deprecation string) (bool, error) {
 	if d.K8sVersion == "" {
-		return false, nil
+		info, err := d.KubeClient.Client.ServerVersion()
+
+		if err == nil && info != nil {
+			d.K8sVersion = fmt.Sprintf("%s.%s", info.Major, info.Minor)
+		}
 	}
 
 	c, err := semver.NewConstraint("< " + deprecation)
