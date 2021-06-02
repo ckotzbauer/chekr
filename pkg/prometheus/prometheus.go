@@ -13,10 +13,11 @@ import (
 )
 
 type Prometheus struct {
-	Url      string
-	UserName string
-	Password config.Secret
-	Timeout  time.Duration
+	Url       string
+	UserName  string
+	Password  config.Secret
+	CountDays int64
+	Timeout   time.Duration
 }
 
 func (prom Prometheus) InitPrometheus() v1.API {

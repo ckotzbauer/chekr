@@ -16,7 +16,7 @@ import (
 func (r Resource) Execute() (printer.PrintableList, error) {
 	v1api := r.Prometheus.InitPrometheus()
 	queryRange := v1.Range{
-		Start: time.Now().Add(-time.Hour * 24 * 30),
+		Start: time.Now().Add(-time.Hour * 24 * time.Duration(r.Prometheus.CountDays)),
 		End:   time.Now(),
 		Step:  time.Minute * 5,
 	}

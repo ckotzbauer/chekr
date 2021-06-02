@@ -20,6 +20,7 @@ var resourcesCmd = &cobra.Command{
 		url, _ := cmd.Flags().GetString("prometheus-url")
 		username, _ := cmd.Flags().GetString("prometheus-username")
 		password, _ := cmd.Flags().GetString("prometheus-password")
+		countDays, _ := cmd.Flags().GetInt64("count-days")
 		timeout, _ := cmd.Flags().GetDuration("timeout")
 
 		selector, _ := cmd.Flags().GetString("selector")
@@ -27,10 +28,11 @@ var resourcesCmd = &cobra.Command{
 
 		r := resources.Resource{
 			Prometheus: prometheus.Prometheus{
-				Url:      url,
-				UserName: username,
-				Password: config.Secret(password),
-				Timeout:  timeout,
+				Url:       url,
+				UserName:  username,
+				Password:  config.Secret(password),
+				CountDays: countDays,
+				Timeout:   timeout,
 			},
 			KubeOverrides: overrides,
 			KubeClient:    kubernetes.NewClient(overrides),
@@ -59,6 +61,7 @@ func init() {
 	resourcesCmd.Flags().StringP("prometheus-url", "u", "", "Prometheus-URL")
 	resourcesCmd.Flags().StringP("prometheus-username", "U", "", "Prometheus-Username")
 	resourcesCmd.Flags().StringP("prometheus-password", "P", "", "Prometheus-Password")
+	resourcesCmd.Flags().Int64P("count-days", "d", 30, "Count of days to analyze metrics from (until now).")
 	resourcesCmd.Flags().DurationP("timeout", "t", time.Duration(30)*time.Second, "Timeout")
 
 	resourcesCmd.Flags().StringP("selector", "l", "", "Label-Selector")
