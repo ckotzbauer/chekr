@@ -38,8 +38,10 @@ func (r Resource) Execute() (printer.PrintableList, error) {
 	podValuesList := PodValuesList{Items: []PodValues{}}
 
 	for _, pod := range pods {
-		ch := ch1.(func(Resource, corev1.Pod, v1.API, v1.Range) chan printer.PrintableResult)(r, pod, v1api, queryRange)
-		channels = append(channels, ch)
+		if pod.Status.Phase == corev1.PodRunning {
+			ch := ch1.(func(Resource, corev1.Pod, v1.API, v1.Range) chan printer.PrintableResult)(r, pod, v1api, queryRange)
+			channels = append(channels, ch)
+		}
 	}
 
 	for _, v := range channels {
