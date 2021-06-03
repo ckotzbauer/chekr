@@ -11,7 +11,7 @@ Chekr is a cli-tool to handle some common cases of ongoing maintenance tasks whe
 
 * Generate a high-availability report of your workload depending on your configurations.
 * Generate a resource-usage overview by querying Prometheus metrics and compare them with the requests and limits beeing set.
-* List deprecated API obbjects
+* List deprecated API objects
 * Output as table, json or html.
 * Bash completions (Bash, Zsh, Fish, PowerShell)
 
@@ -62,6 +62,7 @@ is detected. By default the namespace of the `kubeconfig context` is used for th
     --cluster string                 The name of the kubeconfig cluster to use
     --context string                 The name of the kubeconfig context to use
     --insecure-skip-tls-verify       If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
+    --kubeconfig string              Path to the kubeconfig file to use for CLI requests.
 -n, --namespace string               If present, the namespace scope for this CLI request
 -o, --output string                  Output-Format. Valid values are [table, json, html] (default "table")
     --output-file string             File to write to output to.
@@ -72,6 +73,7 @@ is detected. By default the namespace of the `kubeconfig context` is used for th
     --token string                   Bearer token for authentication to the API server
     --user string                    The name of the kubeconfig user to use
     --username string                Username for basic authentication to the API server
+-v, --verbosity string               Log-level (debug, info, warn, error, fatal, panic) (default "warning")
 ```
 
 ### High-availability
@@ -110,10 +112,11 @@ Flags:
 
 To generate a report about the resource-consumption from pods you can use this subcommand. It queries the given Prometheus server
 (`--prometheus-url` is mandatory) and compares the `Requests`, `Limits` and `Usage` metrics for memory and cpu of the last **30 days**.
-To change the default namespace use global `-n` flag. You can filter by pod-selectors with `-l`. The `--timeout` duration applies to the
-Prometheus client.
+To change the default namespace use global `-n` flag and for the count of days `-d`. You can filter by pod-selectors with `-l`.
+The `--timeout` duration applies to the Prometheus client. Stopped Pods are ignored automatically.
 
 [See used prometheus metrics](https://github.com/ckotzbauer/chekr/blob/master/pkg/resources/metrics.go)
+**Note:** You can specify a URL to any Promtheus-API-compliant application. Mostly *[Thanos](https://thanos.io/)* is notable here.
 
 ```
 Analyze resource requests and limits of pods.
@@ -122,6 +125,7 @@ Usage:
   chekr resources [flags]
 
 Flags:
+  -d, --count-days int               Count of days to analyze metrics from (until now). (default 30)
   -h, --help                         help for resources
   -P, --prometheus-password string   Prometheus-Password
   -u, --prometheus-url string        Prometheus-URL (mandatory)
@@ -134,8 +138,8 @@ Flags:
 
 To get an overview of api-objects in your cluster which are deprecated you can use this feature. It scans all objects and gives you a list
 of objects which are deprecated and will be removed in a future version. You can ignore kinds with `-i`. To only view deprecations until a given
-version you can specify `-V`. This will hide all items, which are deprecated in a never version than specified. Increase the burst with `-t` to bypass throttling
-from the Kubernetes server.
+version you can specify `-V`. By default chekr will use the server-version of your cluster. This will hide all items, which are deprecated in 
+a never version than specified. Increase the burst with `-t` to bypass throttling from the Kubernetes server.
 
 **Note:** This command always scans all namespaces and cannot be filtered with the global `-n` flag.
 This feature was inspired by https://github.com/rikatz/kubepug.
