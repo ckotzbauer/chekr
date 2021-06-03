@@ -51,15 +51,15 @@ type PodAvailabilityList struct {
 	Items []PodAvailability
 }
 
-func (p PodAvailabilityList) ToJson() (string, error) {
+func (p PodAvailabilityList) ToJson() string {
 	return printer.ToJson(p.Items)
 }
 
-func (p PodAvailabilityList) ToHtml() (string, error) {
+func (p PodAvailabilityList) ToHtml() string {
 	return printer.ToHtml(fmt.Sprintf(HtmlPage, description), p)
 }
 
-func (p PodAvailabilityList) ToTable() (string, error) {
+func (p PodAvailabilityList) ToTable() string {
 	buf := new(bytes.Buffer)
 	table := tablewriter.NewWriter(buf)
 	table.SetRowSeparator("-")
@@ -92,5 +92,5 @@ func (p PodAvailabilityList) ToTable() (string, error) {
 
 	table.Render()
 	content := buf.String()
-	return fmt.Sprintf("%s %s", content, description), nil
+	return fmt.Sprintf("%s %s", content, description)
 }

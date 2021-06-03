@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/ckotzbauer/chekr/pkg/kubernetes"
@@ -41,12 +40,7 @@ var resourcesCmd = &cobra.Command{
 			Namespace:     namespace,
 		}
 
-		list, err := r.Execute()
-
-		if err != nil {
-			fmt.Printf("Error: %v", err)
-			return
-		}
+		list := r.Execute()
 
 		output, _ := cmd.Flags().GetString("output")
 		outputFile, _ := cmd.Flags().GetString("output-file")

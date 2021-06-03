@@ -5,13 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 
 	semver "github.com/Masterminds/semver/v3"
 	"github.com/ckotzbauer/chekr/pkg/kubernetes"
 	"github.com/ckotzbauer/chekr/pkg/printer"
 	"github.com/ckotzbauer/chekr/pkg/util"
 	"github.com/ddelizia/channelify"
+	"github.com/sirupsen/logrus"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -22,22 +22,18 @@ import (
 
 var ignoredDeprecatedKinds = []string{"Event"}
 
-func (d Deprecation) Execute() (printer.PrintableList, error) {
-	apis, err := fetchDeprecatedApis()
-
-	if err != nil {
-		return nil, err
-	}
+func (d Deprecation) Execute() printer.PrintableList {
+	apis := fetchDeprecatedApis()
 
 	rest.SetDefaultWarningHandler(rest.NoWarnings{})
 	return d.findDeprecatedVersions(apis)
 }
 
-func fetchDeprecatedApis() ([]GroupVersion, error) {
+func fetchDeprecatedApis() []GroupVersion {
 	file, err := ioutil.TempFile("", "k8s_deprecation")
 
 	if err != nil {
-		return nil, err
+		logrus.WithError(err).Fatalf("Could not create temp-file!")
 	}
 
 	err = util.DownloadFile(
@@ -45,33 +41,33 @@ func fetchDeprecatedApis() ([]GroupVersion, error) {
 		"https://raw.githubusercontent.com/ckotzbauer/chekr/master/data/k8s_deprecations_generated.json")
 
 	if err != nil {
-		return nil, err
+		logrus.WithError(err).Fatalf("Could not download deprecation-definition!")
 	}
 
 	buf, err := ioutil.ReadFile(file.Name())
 
 	if err != nil {
-		return nil, err
+		logrus.WithError(err).Fatalf("Could not read deprecation-definition!")
 	}
 
 	data := []GroupVersion{}
 	err = json.Unmarshal([]byte(buf), &data)
 
 	if err != nil {
-		return nil, err
+		logrus.WithError(err).Fatalf("Could not unmarshal deprecation-definition!")
 	}
 
-	return data, nil
+	return data
 }
 
-func (d Deprecation) findDeprecatedVersions(deprecatedGVs []GroupVersion) (DeprecatedResourceList, error) {
+func (d Deprecation) findDeprecatedVersions(deprecatedGVs []GroupVersion) DeprecatedResourceList {
 	kindVersions := d.KubeClient.DiscoverResourceNameAndPreferredGV()
 	d.KubeClient.Config.Burst = d.ThrottleBurst
 	dynamicClient, err := dynamic.NewForConfig(d.KubeClient.Config)
 	ignoredDeprecatedKinds = append(ignoredDeprecatedKinds, d.IgnoredKinds...)
 
 	if err != nil {
-		return DeprecatedResourceList{}, err
+		logrus.WithError(err).Fatalf("Could not create Kubernetes discovery client!")
 	}
 
 	fn1 := func(
@@ -79,22 +75,18 @@ func (d Deprecation) findDeprecatedVersions(deprecatedGVs []GroupVersion) (Depre
 		deprecatedGV GroupVersion,
 		deprecatedGVR Resource,
 		client dynamic.Interface,
-		kindVersions kubernetes.KindVersions) printer.PrintableResult {
+		kindVersions kubernetes.KindVersions) printer.Printable {
 
 		return d.analyzeDeprecatedResource(deprecatedGV, deprecatedGVR, dynamicClient, kindVersions)
 	}
 
 	ch1 := channelify.Channelify(fn1)
-	var channels [](chan printer.PrintableResult)
+	var channels [](chan printer.Printable)
 	deprecatedList := DeprecatedResourceList{Items: []DeprecatedResource{}}
 
 	for _, deprecatedGV := range deprecatedGVs {
 		for _, deprecatedGVR := range deprecatedGV.Resources {
-			ignored, err := d.isVersionIgnored(deprecatedGVR.Deprecated)
-
-			if err != nil {
-				return DeprecatedResourceList{}, err
-			}
+			ignored := d.isVersionIgnored(deprecatedGVR.Deprecated)
 
 			if ignored || util.Contains(ignoredDeprecatedKinds, deprecatedGVR.Name) {
 				continue
@@ -105,7 +97,7 @@ func (d Deprecation) findDeprecatedVersions(deprecatedGVs []GroupVersion) (Depre
 				continue
 			}
 
-			ch := ch1.(func(Deprecation, GroupVersion, Resource, dynamic.Interface, kubernetes.KindVersions) chan printer.PrintableResult)(d, deprecatedGV, deprecatedGVR, dynamicClient, kindVersions)
+			ch := ch1.(func(Deprecation, GroupVersion, Resource, dynamic.Interface, kubernetes.KindVersions) chan printer.Printable)(d, deprecatedGV, deprecatedGVR, dynamicClient, kindVersions)
 			channels = append(channels, ch)
 		}
 	}
@@ -113,25 +105,21 @@ func (d Deprecation) findDeprecatedVersions(deprecatedGVs []GroupVersion) (Depre
 	for _, v := range channels {
 		result := <-v
 
-		if result.Error != nil {
-			return DeprecatedResourceList{}, result.Error
-		}
-
-		if result.Item == nil {
+		if result == nil {
 			continue
 		}
 
-		deprecatedList.Items = append(deprecatedList.Items, result.Item.([]DeprecatedResource)...)
+		deprecatedList.Items = append(deprecatedList.Items, result.([]DeprecatedResource)...)
 	}
 
-	return deprecatedList, nil
+	return deprecatedList
 }
 
 func (d Deprecation) analyzeDeprecatedResource(
 	deprecatedGV GroupVersion,
 	deprecatedGVR Resource,
 	client dynamic.Interface,
-	kindVersions kubernetes.KindVersions) printer.PrintableResult {
+	kindVersions kubernetes.KindVersions) printer.Printable {
 
 	deprecated := make([]DeprecatedResource, 0)
 	supportedVersions := kindVersions[deprecatedGVR.Name]
@@ -139,23 +127,23 @@ func (d Deprecation) analyzeDeprecatedResource(
 
 	if supported.Version == "" {
 		// This deprecated version does not exist anymore "Deleted"
-		return printer.PrintableResult{Item: deprecated}
+		return deprecated
 	}
 
 	gvr := schema.GroupVersionResource{Group: deprecatedGV.Group, Version: deprecatedGV.Version, Resource: supported.Name}
 	deprecatedItems, err := client.Resource(gvr).List(context.TODO(), metav1.ListOptions{})
 
 	if apierrors.IsNotFound(err) || apierrors.IsMethodNotSupported(err) {
-		return printer.PrintableResult{Item: deprecated}
+		return deprecated
 	}
 
 	if apierrors.IsForbidden(err) {
-		log.Fatalf("Failed to list objects in the cluster. Permission denied! Please check if you have the proper authorization")
-		return printer.PrintableResult{Item: deprecated}
+		logrus.WithError(err).Fatalf("Failed to list objects in the cluster. Permission denied! Please check if you have the proper authorization")
+		return deprecated
 	}
 
 	if err != nil {
-		log.Fatalf("Failed communicating with k8s while listing objects [%v] %v. \nError: %v", gvr.String(), apierrors.ReasonForError(err), err)
+		logrus.WithError(err).WithField("reason", apierrors.ReasonForError(err)).Fatalf("Failed communicating with k8s while listing objects [%v]", gvr.String())
 	}
 
 	if len(deprecatedItems.Items) > 0 {
@@ -166,15 +154,15 @@ func (d Deprecation) analyzeDeprecatedResource(
 			replacementItems, err := client.Resource(replacementGvr).List(context.TODO(), metav1.ListOptions{})
 
 			if apierrors.IsNotFound(err) {
-				return printer.PrintableResult{Item: deprecated}
+				return deprecated
 			}
 
 			if apierrors.IsForbidden(err) {
-				log.Fatalf("Failed to list objects in the cluster. Permission denied! Please check if you have the proper authorization")
+				logrus.WithError(err).Fatalf("Failed to list objects in the cluster. Permission denied! Please check if you have the proper authorization")
 			}
 
 			if err != nil {
-				log.Fatalf("Failed communicating with k8s while listing objects. \nError: %v", err)
+				logrus.WithError(err).Fatalf("Failed communicating with k8s while listing objects.")
 			}
 
 			for _, deprecatedItem := range deprecatedItems.Items {
@@ -189,10 +177,10 @@ func (d Deprecation) analyzeDeprecatedResource(
 		}
 	}
 
-	return printer.PrintableResult{Item: deprecated}
+	return deprecated
 }
 
-func (d Deprecation) isVersionIgnored(deprecation string) (bool, error) {
+func (d Deprecation) isVersionIgnored(deprecation string) bool {
 	if d.K8sVersion == "" {
 		info, err := d.KubeClient.Client.ServerVersion()
 
@@ -204,16 +192,16 @@ func (d Deprecation) isVersionIgnored(deprecation string) (bool, error) {
 	c, err := semver.NewConstraint("< " + deprecation)
 
 	if err != nil {
-		return false, err
+		logrus.WithError(err).WithField("constraint", "< "+deprecation).Fatalf("Could not parse version-constraint!")
 	}
 
 	v, err := semver.NewVersion(d.K8sVersion)
 
 	if err != nil {
-		return false, err
+		logrus.WithError(err).WithField("version1", deprecation).WithField("version2", d.K8sVersion).Fatalf("Could not compare versions!")
 	}
 
-	return c.Check(v), nil
+	return c.Check(v)
 }
 
 func createDeprecationItem(deprecatedItem *unstructured.Unstructured, metadata Resource) DeprecatedResource {

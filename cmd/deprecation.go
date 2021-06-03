@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/ckotzbauer/chekr/pkg/deprecation"
 	"github.com/ckotzbauer/chekr/pkg/kubernetes"
 	"github.com/ckotzbauer/chekr/pkg/printer"
@@ -28,12 +26,7 @@ var deprecationCmd = &cobra.Command{
 			ThrottleBurst: throttleBurst,
 		}
 
-		list, err := r.Execute()
-
-		if err != nil {
-			fmt.Printf("Error: %v", err)
-			return
-		}
+		list := r.Execute()
 
 		output, _ := cmd.Flags().GetString("output")
 		outputFile, _ := cmd.Flags().GetString("output-file")

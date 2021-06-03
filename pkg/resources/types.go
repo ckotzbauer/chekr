@@ -40,15 +40,15 @@ type PodValuesList struct {
 	Items []PodValues
 }
 
-func (p PodValuesList) ToJson() (string, error) {
+func (p PodValuesList) ToJson() string {
 	return printer.ToJson(p.Items)
 }
 
-func (p PodValuesList) ToHtml() (string, error) {
+func (p PodValuesList) ToHtml() string {
 	return printer.ToHtml(HtmlPage, p)
 }
 
-func (p PodValuesList) ToTable() (string, error) {
+func (p PodValuesList) ToTable() string {
 	buf := new(bytes.Buffer)
 	table := tablewriter.NewWriter(buf)
 	table.SetRowSeparator("-")
@@ -76,5 +76,5 @@ func (p PodValuesList) ToTable() (string, error) {
 	}
 
 	table.Render()
-	return buf.String(), nil
+	return buf.String()
 }

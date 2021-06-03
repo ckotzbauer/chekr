@@ -2,14 +2,13 @@ package prometheus
 
 import (
 	"context"
-	"fmt"
-	"os"
 	"time"
 
 	"github.com/prometheus/client_golang/api"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/config"
 	"github.com/prometheus/common/model"
+	"github.com/sirupsen/logrus"
 )
 
 type Prometheus struct {
@@ -32,8 +31,7 @@ func (prom Prometheus) InitPrometheus() v1.API {
 	client, err := api.NewClient(cfg)
 
 	if err != nil {
-		fmt.Printf("Error creating client: %v\n", err)
-		os.Exit(1)
+		logrus.WithError(err).Fatalf("Could create prometheus-client!")
 	}
 
 	v1api := v1.NewAPI(client)
@@ -46,7 +44,7 @@ func (prom Prometheus) QueryRange(v1api v1.API, query string, r v1.Range) (model
 	result, warnings, err := v1api.QueryRange(ctx, query, r)
 
 	if len(warnings) > 0 {
-		fmt.Printf("Warnings: %v\n", warnings)
+		logrus.Warnf("Prometheus-Warnings %v", warnings)
 	}
 
 	return result, err

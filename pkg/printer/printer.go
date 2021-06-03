@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"html/template"
 	"os"
+
+	"github.com/sirupsen/logrus"
 )
 
 type Printer struct {
@@ -13,51 +15,53 @@ type Printer struct {
 	File string
 }
 
-func (p Printer) Print(list PrintableList) error {
+func (p Printer) Print(list PrintableList) {
 	var out string
-	var err error
 
 	if p.Type == "json" {
-		out, err = list.ToJson()
+		out = list.ToJson()
 	} else if p.Type == "html" {
-		out, err = list.ToHtml()
+		out = list.ToHtml()
 	} else {
-		out, err = list.ToTable()
-	}
-
-	if err != nil {
-		return err
+		out = list.ToTable()
 	}
 
 	if p.File != "" {
 		data := []byte(out)
-		err = os.WriteFile(p.File, data, 0)
+		err := os.WriteFile(p.File, data, 0)
+
+		if err != nil {
+			logrus.WithError(err).Fatalf("Could write output to file!")
+		}
 	} else {
 		fmt.Fprint(os.Stdout, out)
 	}
-
-	return err
 }
 
-func ToJson(v interface{}) (string, error) {
+func ToJson(v interface{}) string {
 	b, err := json.Marshal(v)
 	if err != nil {
-		return "", err
+		logrus.WithError(err).Fatalf("Could not marshal object!")
 	}
 
-	return string(b), nil
+	return string(b)
 }
 
-func ToHtml(html string, v interface{}) (string, error) {
+func ToHtml(html string, v interface{}) string {
 	buf := new(bytes.Buffer)
 	tpl := template.New("page")
 	tpl, err := tpl.Parse(html)
 
 	if err != nil {
-		return "", nil
+		logrus.WithError(err).Fatalf("Could create html-page!")
 	}
 
 	err = tpl.Execute(buf, v)
+
+	if err != nil {
+		logrus.WithError(err).Fatalf("Could create html-page!")
+	}
+
 	content := buf.String()
-	return fmt.Sprintf(HtmlContainer, content), err
+	return fmt.Sprintf(HtmlContainer, content)
 }

@@ -6,12 +6,13 @@ import (
 	"github.com/ckotzbauer/chekr/pkg/printer"
 	"github.com/ckotzbauer/chekr/pkg/util"
 	"github.com/ddelizia/channelify"
+	"github.com/sirupsen/logrus"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 )
 
-func (h HighAvailability) Execute() (printer.PrintableList, error) {
+func (h HighAvailability) Execute() printer.PrintableList {
 	var pods []corev1.Pod
 
 	if h.Selector == "" {
@@ -20,31 +21,27 @@ func (h HighAvailability) Execute() (printer.PrintableList, error) {
 		pods = h.KubeClient.ListPods(h.Namespace, h.Selector)
 	}
 
-	fn1 := func(h HighAvailability, pod corev1.Pod) printer.PrintableResult {
+	fn1 := func(h HighAvailability, pod corev1.Pod) printer.Printable {
 		return h.analyzePod(pod)
 	}
 
 	ch1 := channelify.Channelify(fn1)
-	var channels [](chan printer.PrintableResult)
+	var channels [](chan printer.Printable)
 	podAvailabilityList := PodAvailabilityList{Items: []PodAvailability{}}
 
 	for _, pod := range pods {
-		ch := ch1.(func(HighAvailability, corev1.Pod) chan printer.PrintableResult)(h, pod)
+		ch := ch1.(func(HighAvailability, corev1.Pod) chan printer.Printable)(h, pod)
 		channels = append(channels, ch)
 	}
 
 	for _, v := range channels {
 		result := <-v
 
-		if result.Error != nil {
-			return nil, result.Error
-		}
-
-		if result.Item == nil {
+		if result == nil {
 			continue
 		}
 
-		podAvailabilityList.Items = append(podAvailabilityList.Items, result.Item.(PodAvailability))
+		podAvailabilityList.Items = append(podAvailabilityList.Items, result.(PodAvailability))
 	}
 
 	owners := make([]string, 0)
@@ -60,25 +57,24 @@ func (h HighAvailability) Execute() (printer.PrintableList, error) {
 		uniqueList.Items = append(uniqueList.Items, i)
 	}
 
-	return uniqueList, nil
+	return uniqueList
 }
 
-func (h HighAvailability) analyzePod(pod corev1.Pod) printer.PrintableResult {
+func (h HighAvailability) analyzePod(pod corev1.Pod) printer.Printable {
 	availability := PodAvailability{
 		Namespace: pod.Namespace,
 	}
 
 	kind := util.GetOwnerKind(pod.OwnerReferences)
-	var err error
 
 	if kind == "ReplicaSet" {
-		err = h.analyzeReplicaSet(&availability, pod)
+		h.analyzeReplicaSet(&availability, pod)
 	} else if kind == "StatefulSet" {
-		err = h.analyzeStatefulSet(pod.OwnerReferences, &availability)
+		h.analyzeStatefulSet(pod.OwnerReferences, &availability)
 	} else if kind == "DaemonSet" {
-		err = h.analyzeDaemonSet(pod.OwnerReferences, &availability)
+		h.analyzeDaemonSet(pod.OwnerReferences, &availability)
 	} else if kind == "Job" {
-		return printer.PrintableResult{}
+		return availability
 	} else if kind != "" {
 		// A CRD-Operator created the pod
 		availability.Type = kind
@@ -89,52 +85,42 @@ func (h HighAvailability) analyzePod(pod corev1.Pod) printer.PrintableResult {
 		availability.Replicas = 1
 	}
 
-	if err != nil {
-		return printer.PrintableResult{Error: err}
-	}
-
-	return printer.PrintableResult{Item: availability}
+	return availability
 }
 
-func (h HighAvailability) analyzeReplicaSet(availability *PodAvailability, pod corev1.Pod) error {
+func (h HighAvailability) analyzeReplicaSet(availability *PodAvailability, pod corev1.Pod) {
 	rs, err := h.KubeClient.GetReplicaSet(pod)
 
 	if err != nil {
-		return err
+		logrus.WithError(err).WithField("pod", pod.Namespace+"/"+pod.Name).Fatalf("Could not get ReplicaSet for pod!")
 	}
 
 	availability.Type = util.GetOwnerKind(rs.OwnerReferences)
 	availability.Replicas = *rs.Spec.Replicas
 
 	if availability.Type == "Deployment" {
-		err = h.analyzeDeployment(rs.OwnerReferences, availability)
+		h.analyzeDeployment(rs.OwnerReferences, availability)
 	}
-
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
-func (h HighAvailability) analyzeDeployment(refs []metav1.OwnerReference, availability *PodAvailability) error {
+func (h HighAvailability) analyzeDeployment(refs []metav1.OwnerReference, availability *PodAvailability) {
 	deployment, err := h.KubeClient.GetDeployment(availability.Namespace, refs[0].Name)
 
 	if err != nil {
-		return err
+		logrus.WithError(err).WithField("deployment", availability.Namespace+"/"+refs[0].Name).Fatalf("Could not get Deployment!")
 	}
 
 	availability.Name = deployment.Name
 	availability.Owner = "deployment/" + deployment.Name
 	availability.RolloutStrategy = string(deployment.Spec.Strategy.Type)
-	return h.analyzePodTemplace(deployment.Spec.Template, availability)
+	h.analyzePodTemplace(deployment.Spec.Template, availability)
 }
 
-func (h HighAvailability) analyzeDaemonSet(refs []metav1.OwnerReference, availability *PodAvailability) error {
+func (h HighAvailability) analyzeDaemonSet(refs []metav1.OwnerReference, availability *PodAvailability) {
 	daemonSet, err := h.KubeClient.GetDaemonSet(availability.Namespace, refs[0].Name)
 
 	if err != nil {
-		return err
+		logrus.WithError(err).WithField("daemonset", availability.Namespace+"/"+refs[0].Name).Fatalf("Could not get Daemonset for pod!")
 	}
 
 	availability.Name = daemonSet.Name
@@ -142,14 +128,14 @@ func (h HighAvailability) analyzeDaemonSet(refs []metav1.OwnerReference, availab
 	availability.Replicas = daemonSet.Status.NumberReady
 	availability.Owner = "daemonset/" + daemonSet.Name
 	availability.RolloutStrategy = string(daemonSet.Spec.UpdateStrategy.Type)
-	return h.analyzePodTemplace(daemonSet.Spec.Template, availability)
+	h.analyzePodTemplace(daemonSet.Spec.Template, availability)
 }
 
-func (h HighAvailability) analyzeStatefulSet(refs []metav1.OwnerReference, availability *PodAvailability) error {
+func (h HighAvailability) analyzeStatefulSet(refs []metav1.OwnerReference, availability *PodAvailability) {
 	statefulSet, err := h.KubeClient.GetStatefulSet(availability.Namespace, refs[0].Name)
 
 	if err != nil {
-		return err
+		logrus.WithError(err).WithField("statefulset", availability.Namespace+"/"+refs[0].Name).Fatalf("Could not get StatefulSet for pod!")
 	}
 
 	availability.Type = "StatefulSet"
@@ -158,11 +144,7 @@ func (h HighAvailability) analyzeStatefulSet(refs []metav1.OwnerReference, avail
 	availability.Name = statefulSet.Name
 	availability.RolloutStrategy = string(statefulSet.Spec.UpdateStrategy.Type)
 
-	err = h.analyzePodTemplace(statefulSet.Spec.Template, availability)
-
-	if err != nil {
-		return err
-	}
+	h.analyzePodTemplace(statefulSet.Spec.Template, availability)
 
 	if len(statefulSet.Spec.VolumeClaimTemplates) > 0 {
 		if availability.PVC == "" {
@@ -171,18 +153,12 @@ func (h HighAvailability) analyzeStatefulSet(refs []metav1.OwnerReference, avail
 			availability.PVC += ",STS"
 		}
 	}
-
-	return nil
 }
 
-func (h HighAvailability) analyzePodTemplace(spec corev1.PodTemplateSpec, availability *PodAvailability) error {
+func (h HighAvailability) analyzePodTemplace(spec corev1.PodTemplateSpec, availability *PodAvailability) {
 	if spec.Spec.Affinity != nil && spec.Spec.Affinity.PodAntiAffinity != nil {
 		affinity := spec.Spec.Affinity.PodAntiAffinity
-		matched, err := hasMatchingPodAntiAffinity(affinity, spec.Labels)
-
-		if err != nil {
-			return err
-		}
+		matched := hasMatchingPodAntiAffinity(affinity, spec.Labels)
 
 		if matched {
 			availability.PodAntiAffinity = "Yes"
@@ -200,7 +176,7 @@ func (h HighAvailability) analyzePodTemplace(spec corev1.PodTemplateSpec, availa
 			pvc, err := h.KubeClient.GetPersistentVolumeClaim(h.Namespace, volume.PersistentVolumeClaim.ClaimName)
 
 			if err != nil {
-				return err
+				logrus.WithError(err).WithField("pvc", h.Namespace+"/"+volume.PersistentVolumeClaim.ClaimName).Fatalf("Could not get PVC!")
 			}
 
 			for _, am := range pvc.Spec.AccessModes {
@@ -216,7 +192,6 @@ func (h HighAvailability) analyzePodTemplace(spec corev1.PodTemplateSpec, availa
 	}
 
 	availability.PVC = strings.Join(pvcs, ",")
-	return nil
 }
 
 func (h HighAvailability) rankPod(pod *PodAvailability) {
@@ -252,18 +227,18 @@ func (h HighAvailability) rankPod(pod *PodAvailability) {
 	}
 }
 
-func hasMatchingPodAntiAffinity(affinity *corev1.PodAntiAffinity, podLabels map[string]string) (bool, error) {
+func hasMatchingPodAntiAffinity(affinity *corev1.PodAntiAffinity, podLabels map[string]string) bool {
 	for _, reqAffinity := range affinity.RequiredDuringSchedulingIgnoredDuringExecution {
 		selector, err := metav1.LabelSelectorAsSelector(reqAffinity.LabelSelector)
 
 		if err != nil {
-			return false, err
+			logrus.WithError(err).WithField("selector", reqAffinity.LabelSelector).Fatalf("Could not convert label-selector!")
 		}
 
 		if selector.Matches(labels.Set(podLabels)) {
-			return true, nil
+			return true
 		}
 	}
 
-	return false, nil
+	return false
 }

@@ -11,9 +11,10 @@ import (
 	"github.com/ddelizia/channelify"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
+	"github.com/sirupsen/logrus"
 )
 
-func (r Resource) Execute() (printer.PrintableList, error) {
+func (r Resource) Execute() printer.PrintableList {
 	v1api := r.Prometheus.InitPrometheus()
 	queryRange := v1.Range{
 		Start: time.Now().Add(-time.Hour * 24 * time.Duration(r.Prometheus.CountDays)),
@@ -29,17 +30,17 @@ func (r Resource) Execute() (printer.PrintableList, error) {
 		pods = r.KubeClient.ListPods(r.Namespace, r.Selector)
 	}
 
-	fn1 := func(r Resource, pod corev1.Pod, v1api v1.API, queryRange v1.Range) printer.PrintableResult {
+	fn1 := func(r Resource, pod corev1.Pod, v1api v1.API, queryRange v1.Range) printer.Printable {
 		return r.analyzePod(pod, v1api, queryRange)
 	}
 
 	ch1 := channelify.Channelify(fn1)
-	var channels [](chan printer.PrintableResult)
+	var channels [](chan printer.Printable)
 	podValuesList := PodValuesList{Items: []PodValues{}}
 
 	for _, pod := range pods {
 		if pod.Status.Phase == corev1.PodRunning {
-			ch := ch1.(func(Resource, corev1.Pod, v1.API, v1.Range) chan printer.PrintableResult)(r, pod, v1api, queryRange)
+			ch := ch1.(func(Resource, corev1.Pod, v1.API, v1.Range) chan printer.Printable)(r, pod, v1api, queryRange)
 			channels = append(channels, ch)
 		}
 	}
@@ -47,17 +48,13 @@ func (r Resource) Execute() (printer.PrintableList, error) {
 	for _, v := range channels {
 		result := <-v
 
-		if result.Error != nil {
-			return nil, result.Error
-		}
-
-		podValuesList.Items = append(podValuesList.Items, result.Item.(PodValues))
+		podValuesList.Items = append(podValuesList.Items, result.(PodValues))
 	}
 
-	return podValuesList, nil
+	return podValuesList
 }
 
-func (r Resource) analyzePod(pod corev1.Pod, v1api v1.API, queryRange v1.Range) printer.PrintableResult {
+func (r Resource) analyzePod(pod corev1.Pod, v1api v1.API, queryRange v1.Range) printer.Printable {
 	podValues := PodValues{
 		Namespace:      pod.Namespace,
 		Pod:            pod.Name,
@@ -67,10 +64,10 @@ func (r Resource) analyzePod(pod corev1.Pod, v1api v1.API, queryRange v1.Range) 
 		CPULimits:      AnalyzedValues{},
 	}
 
-	matrix, err := queryMatrix(r.Prometheus, v1api, Memory(pod.Namespace, pod.Name), queryRange)
+	matrix, err := queryMatrix(r.Prometheus, v1api, Metrics(pod.Namespace, pod.Name), queryRange)
 
 	if err != nil {
-		return printer.PrintableResult{Error: err}
+		logrus.WithError(err).WithField("pod", pod.Namespace+"/"+pod.Name).Fatalf("Could not query metrics for pod!")
 	}
 
 	calculate(
@@ -87,7 +84,7 @@ func (r Resource) analyzePod(pod corev1.Pod, v1api v1.API, queryRange v1.Range) 
 		&podValues.CPURequests,
 		&podValues.CPULimits)
 
-	return printer.PrintableResult{Item: podValues}
+	return podValues
 }
 
 func calculate(usageMetric, requestMetric, limitMetric *model.SampleStream, analyzedRequests, analyzedLimits *AnalyzedValues) {

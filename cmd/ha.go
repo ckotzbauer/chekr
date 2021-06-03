@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/ckotzbauer/chekr/pkg/ha"
 	"github.com/ckotzbauer/chekr/pkg/kubernetes"
 	"github.com/ckotzbauer/chekr/pkg/printer"
@@ -25,12 +23,7 @@ var haCmd = &cobra.Command{
 			Namespace:     namespace,
 		}
 
-		list, err := r.Execute()
-
-		if err != nil {
-			fmt.Printf("Error: %v", err)
-			return
-		}
+		list := r.Execute()
 
 		output, _ := cmd.Flags().GetString("output")
 		outputFile, _ := cmd.Flags().GetString("output-file")

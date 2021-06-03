@@ -2,10 +2,9 @@ package kubernetes
 
 import (
 	"context"
-	"fmt"
-	"log"
 	"strings"
 
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	appsv1 "k8s.io/api/apps/v1"
@@ -39,26 +38,24 @@ func NewClient(cmd *cobra.Command, configOverrides *clientcmd.ConfigOverrides) *
 	configFile, err := cmd.Root().PersistentFlags().GetString(clientcmd.RecommendedConfigPathFlag)
 
 	if err != nil {
-		fmt.Println(err) // TODO: logging
+		logrus.WithError(err).Fatalf("kubeconfig flag could not be retrieved!")
 	}
 
 	if configFile != "" {
 		loadingRules.Precedence = []string{configFile}
 	}
 
-	// if you want to change the loading rules (which files in which order), you can do so here
-
 	var config *rest.Config
 
 	kubeConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loadingRules, configOverrides)
 	config, err = kubeConfig.ClientConfig()
 	if err != nil {
-		panic(err.Error())
+		logrus.WithError(err).Fatalf("kubeconfig file could not be found!")
 	}
 
 	client, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		panic(err.Error())
+		logrus.WithError(err).Fatalf("Could not create Kubernetes client from config!")
 	}
 
 	return &KubeClient{Client: client, Config: config}
@@ -67,7 +64,7 @@ func NewClient(cmd *cobra.Command, configOverrides *clientcmd.ConfigOverrides) *
 func (kubeClient *KubeClient) ListPods(namespace, labelSelector string) []corev1.Pod {
 	list, err := kubeClient.Client.CoreV1().Pods(namespace).List(context.Background(), metav1.ListOptions{LabelSelector: labelSelector})
 	if err != nil {
-		panic(err.Error())
+		logrus.WithError(err).WithField("namespace", namespace).WithField("labelSelector", labelSelector).Fatalf("Could list pods!")
 	}
 
 	return list.Items
@@ -139,10 +136,10 @@ func (kubeClient *KubeClient) DiscoverResourceNameAndPreferredGV() KindVersions 
 		}
 
 		if apierrors.IsForbidden(err) {
-			log.Fatalf("Failed to list objects for Name discovery. Permission denied! Please check if you have the proper authorization")
+			logrus.WithError(err).Fatalf("Failed to list objects for Name discovery. Permission denied! Please check if you have the proper authorization")
 		}
 
-		log.Fatalf("Failed communicating with k8s while discovering the object preferred name and gv. Error: %v", err)
+		logrus.WithError(err).Fatalf("Failed communicating with k8s while discovering the object preferred name and gv")
 	}
 
 	for _, resourceGroup := range resources {
