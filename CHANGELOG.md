@@ -1,3 +1,49 @@
+## Version 0.2.0 (2021-06-03)
+
+### Features and improvements
+
+* [[`df4ebc72`](https://github.com/ckotzbauer&#x2F;chekr/commit/df4ebc72)] - **feat**: improve logging and error-handling close #36
+* [[`6397d451`](https://github.com/ckotzbauer&#x2F;chekr/commit/6397d451)] - **feat**: add global kubeconfig flag close #33
+* [[`4af454b9`](https://github.com/ckotzbauer&#x2F;chekr/commit/4af454b9)] - **feat**: default to current cluster-version close #30
+* [[`fb3fd592`](https://github.com/ckotzbauer&#x2F;chekr/commit/fb3fd592)] - **feat**: add count-days param to resources subcommand close #31
+
+### Bug fixes
+
+* [[`a3f97f9a`](https://github.com/ckotzbauer&#x2F;chekr/commit/a3f97f9a)] - **fix**: remove next-suffix for snapshots close #35
+* [[`20b18677`](https://github.com/ckotzbauer&#x2F;chekr/commit/20b18677)] - **fix**: only use running pods close #37
+
+### Build and testing
+
+* [[`aa13d219`](https://github.com/ckotzbauer&#x2F;chekr/commit/aa13d219)] - **build**: use delete&#x3D;true for label-creation
+* [[`436a0998`](https://github.com/ckotzbauer&#x2F;chekr/commit/436a0998)] - **build**: remove readme sync
+* [[`1872ef6e`](https://github.com/ckotzbauer&#x2F;chekr/commit/1872ef6e)] - **build**: remove containerscan for now
+* [[`42faffb2`](https://github.com/ckotzbauer&#x2F;chekr/commit/42faffb2)] - **build**: several docker improvements
+* [[`d6ddfc1a`](https://github.com/ckotzbauer&#x2F;chekr/commit/d6ddfc1a)] - **build**: only test amd64
+* [[`c2721aad`](https://github.com/ckotzbauer&#x2F;chekr/commit/c2721aad)] - **build**: setup qemu and buildx
+* [[`510a2e9f`](https://github.com/ckotzbauer&#x2F;chekr/commit/510a2e9f)] - **build**: use latest
+* [[`0c72becc`](https://github.com/ckotzbauer&#x2F;chekr/commit/0c72becc)] - **build**: tag to latest on release
+* [[`34a63d4b`](https://github.com/ckotzbauer&#x2F;chekr/commit/34a63d4b)] - **build**: test image-build
+
+### Documentation
+
+* [[`086711c3`](https://github.com/ckotzbauer&#x2F;chekr/commit/086711c3)] - **doc**: force line-break
+* [[`13eb62f0`](https://github.com/ckotzbauer&#x2F;chekr/commit/13eb62f0)] - **doc**: doc-additions close #39
+* [[`7f1480e4`](https://github.com/ckotzbauer&#x2F;chekr/commit/7f1480e4)] - **doc**: add https:&#x2F;&#x2F;github.com&#x2F;rikatz&#x2F;kubepug
+* [[`3dd5e51d`](https://github.com/ckotzbauer&#x2F;chekr/commit/3dd5e51d)] - **doc**: small fixes
+* [[`653fdb5f`](https://github.com/ckotzbauer&#x2F;chekr/commit/653fdb5f)] - **doc**: updated docs
+
+### Dependency updates
+
+* [[`c6b563a5`](https://github.com/ckotzbauer&#x2F;chekr/commit/c6b563a5)] - **deps**: Bump pascalgn&#x2F;size-label-action from 0.4.2 to 0.4.3 (#45)
+* [[`4dc8c549`](https://github.com/ckotzbauer&#x2F;chekr/commit/4dc8c549)] - **deps**: update lannonbr&#x2F;issue-label-manager-action action to v3 (#44)
+* [[`b87b0b82`](https://github.com/ckotzbauer&#x2F;chekr/commit/b87b0b82)] - **deps**: Bump pascalgn&#x2F;automerge-action from 0.14.1 to 0.14.2 (#43)
+
+### Common changes
+
+* [[`3f9d43e7`](https://github.com/ckotzbauer&#x2F;chekr/commit/3f9d43e7)] - **chore**: release 0.1.0
+* [[`f542156c`](https://github.com/ckotzbauer&#x2F;chekr/commit/f542156c)] - **security**: add container scan
+
+
 ## Version 0.1.0 (2021-05-23)
 
 ### Build and testing
