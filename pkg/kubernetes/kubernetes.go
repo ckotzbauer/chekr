@@ -2,9 +2,11 @@ package kubernetes
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"strings"
 
+	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -32,12 +34,21 @@ func BindFlags(flags *pflag.FlagSet) *clientcmd.ConfigOverrides {
 	return cmd
 }
 
-func NewClient(configOverrides *clientcmd.ConfigOverrides) *KubeClient {
+func NewClient(cmd *cobra.Command, configOverrides *clientcmd.ConfigOverrides) *KubeClient {
 	loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
+	configFile, err := cmd.Root().PersistentFlags().GetString(clientcmd.RecommendedConfigPathFlag)
+
+	if err != nil {
+		fmt.Println(err) // TODO: logging
+	}
+
+	if configFile != "" {
+		loadingRules.Precedence = []string{configFile}
+	}
+
 	// if you want to change the loading rules (which files in which order), you can do so here
 
 	var config *rest.Config
-	var err error
 
 	kubeConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loadingRules, configOverrides)
 	config, err = kubeConfig.ClientConfig()

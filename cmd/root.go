@@ -37,6 +37,7 @@ func init() {
 
 	rootCmd.PersistentFlags().StringP("output", "o", "table", "Output-Format. Valid values are [table, json, html]")
 	rootCmd.PersistentFlags().StringP("output-file", "", "", "File to write to output to.")
+	rootCmd.PersistentFlags().StringP(clientcmd.RecommendedConfigPathFlag, "", "", "Path to the kubeconfig file to use for CLI requests.")
 
 	overrides = kubernetes.BindFlags(rootCmd.PersistentFlags())
 }

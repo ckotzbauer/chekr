@@ -21,7 +21,7 @@ var deprecationCmd = &cobra.Command{
 
 		r := deprecation.Deprecation{
 			KubeOverrides: overrides,
-			KubeClient:    kubernetes.NewClient(overrides),
+			KubeClient:    kubernetes.NewClient(cmd, overrides),
 			Namespace:     namespace,
 			K8sVersion:    k8sVersion,
 			IgnoredKinds:  ignoredKinds,

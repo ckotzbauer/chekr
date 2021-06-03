@@ -35,7 +35,7 @@ var resourcesCmd = &cobra.Command{
 				Timeout:   timeout,
 			},
 			KubeOverrides: overrides,
-			KubeClient:    kubernetes.NewClient(overrides),
+			KubeClient:    kubernetes.NewClient(cmd, overrides),
 			Pods:          args,
 			Selector:      selector,
 			Namespace:     namespace,
