@@ -116,6 +116,7 @@ To change the default namespace use global `-n` flag and for the count of days `
 The `--timeout` duration applies to the Prometheus client. Stopped Pods are ignored automatically.
 
 [See used prometheus metrics](https://github.com/ckotzbauer/chekr/blob/master/pkg/resources/metrics.go)
+
 **Note:** You can specify a URL to any Promtheus-API-compliant application. Mostly *[Thanos](https://thanos.io/)* is notable here.
 
 ```
