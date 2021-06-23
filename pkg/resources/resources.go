@@ -5,6 +5,7 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 
+	"github.com/ckotzbauer/chekr/pkg/kubernetes"
 	"github.com/ckotzbauer/chekr/pkg/printer"
 	"github.com/ckotzbauer/chekr/pkg/prometheus"
 	"github.com/ckotzbauer/chekr/pkg/util"
@@ -22,13 +23,12 @@ func (r Resource) Execute() printer.PrintableList {
 		Step:  time.Minute * 5,
 	}
 
-	var pods []corev1.Pod
-
-	if r.Selector == "" {
-		pods = r.KubeClient.GetNamespacedPods(r.Namespace, r.Pods)
-	} else if r.Selector != "" {
-		pods = r.KubeClient.ListPods(r.Namespace, r.Selector)
-	}
+	pods := r.KubeClient.ListPods(kubernetes.PodQuery{
+		Namespace:          r.Namespace,
+		LabelSelector:      r.LabelSelector,
+		Names:              r.Pods,
+		AnnotationSelector: r.AnnotationSelector,
+	})
 
 	fn1 := func(r Resource, pod corev1.Pod, v1api v1.API, queryRange v1.Range) printer.Printable {
 		return r.analyzePod(pod, v1api, queryRange)

@@ -3,6 +3,7 @@ package ha
 import (
 	"strings"
 
+	"github.com/ckotzbauer/chekr/pkg/kubernetes"
 	"github.com/ckotzbauer/chekr/pkg/printer"
 	"github.com/ckotzbauer/chekr/pkg/util"
 	"github.com/ddelizia/channelify"
@@ -13,13 +14,12 @@ import (
 )
 
 func (h HighAvailability) Execute() printer.PrintableList {
-	var pods []corev1.Pod
-
-	if h.Selector == "" {
-		pods = h.KubeClient.GetNamespacedPods(h.Namespace, h.Pods)
-	} else if h.Selector != "" {
-		pods = h.KubeClient.ListPods(h.Namespace, h.Selector)
-	}
+	pods := h.KubeClient.ListPods(kubernetes.PodQuery{
+		Namespace:          h.Namespace,
+		LabelSelector:      h.LabelSelector,
+		Names:              h.Pods,
+		AnnotationSelector: h.AnnotationSelector,
+	})
 
 	fn1 := func(h HighAvailability, pod corev1.Pod) printer.Printable {
 		return h.analyzePod(pod)

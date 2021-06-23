@@ -22,7 +22,8 @@ var resourcesCmd = &cobra.Command{
 		countDays, _ := cmd.Flags().GetInt64("count-days")
 		timeout, _ := cmd.Flags().GetDuration("timeout")
 
-		selector, _ := cmd.Flags().GetString("selector")
+		labelSelector, _ := cmd.Flags().GetString("selector")
+		annotationSelector, _ := cmd.Flags().GetString("annotation")
 		namespace, _ := cmd.Flags().GetString("namespace")
 
 		r := resources.Resource{
@@ -33,11 +34,12 @@ var resourcesCmd = &cobra.Command{
 				CountDays: countDays,
 				Timeout:   timeout,
 			},
-			KubeOverrides: overrides,
-			KubeClient:    kubernetes.NewClient(cmd, overrides),
-			Pods:          args,
-			Selector:      selector,
-			Namespace:     namespace,
+			KubeOverrides:      overrides,
+			KubeClient:         kubernetes.NewClient(cmd, overrides),
+			Pods:               args,
+			LabelSelector:      labelSelector,
+			AnnotationSelector: annotationSelector,
+			Namespace:          namespace,
 		}
 
 		list := r.Execute()
@@ -59,6 +61,7 @@ func init() {
 	resourcesCmd.Flags().DurationP("timeout", "t", time.Duration(30)*time.Second, "Timeout")
 
 	resourcesCmd.Flags().StringP("selector", "l", "", "Label-Selector")
+	resourcesCmd.Flags().StringP("annotation", "a", "", "Annotation-Selector")
 
 	resourcesCmd.MarkFlagRequired("prometheus-url")
 }

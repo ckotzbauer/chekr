@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"regexp"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -71,4 +72,22 @@ func DownloadFile(filepath string, url string) error {
 	// Write the body to file
 	_, err = io.Copy(out, resp.Body)
 	return err
+}
+
+func ParseSelector(selector string) []KeyValueSelector {
+	r := regexp.MustCompile(`((?:([a-z0-9A-Z\/\-\._]+)(=|!=)?([a-z0-9A-Z\-\._]+)?)+)`)
+	matchPairs := r.FindAllStringSubmatch(selector, 10)
+	selectors := []KeyValueSelector{}
+
+	for _, matchPair := range matchPairs {
+		if len(matchPair) == 5 {
+			selectors = append(selectors, KeyValueSelector{
+				Key:      matchPair[2],
+				Operator: matchPair[3],
+				Value:    matchPair[4],
+			})
+		}
+	}
+
+	return selectors
 }

@@ -2,8 +2,10 @@ package kubernetes
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
+	"github.com/ckotzbauer/chekr/pkg/util"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -19,6 +21,13 @@ import (
 type KubeClient struct {
 	Client *kubernetes.Clientset
 	Config *rest.Config
+}
+
+type PodQuery struct {
+	Namespace          string
+	LabelSelector      string
+	AnnotationSelector string
+	Names              []string
 }
 
 func IsInCluster() bool {
@@ -61,34 +70,50 @@ func NewClient(cmd *cobra.Command, configOverrides *clientcmd.ConfigOverrides) *
 	return &KubeClient{Client: client, Config: config}
 }
 
-func (kubeClient *KubeClient) ListPods(namespace, labelSelector string) []corev1.Pod {
-	list, err := kubeClient.Client.CoreV1().Pods(namespace).List(context.Background(), metav1.ListOptions{LabelSelector: labelSelector})
-	if err != nil {
-		logrus.WithError(err).WithField("namespace", namespace).WithField("labelSelector", labelSelector).Fatalf("Could list pods!")
+func (kubeClient *KubeClient) ListPods(query PodQuery) []corev1.Pod {
+	listOptions := metav1.ListOptions{}
+
+	if len(query.LabelSelector) > 0 {
+		listOptions.LabelSelector = query.LabelSelector
 	}
 
-	return list.Items
-}
+	list, err := kubeClient.Client.CoreV1().Pods(query.Namespace).List(context.Background(), listOptions)
+	pods := []corev1.Pod{}
 
-func (kubeClient *KubeClient) GetNamespacedPods(namespace string, names []string) []corev1.Pod {
-	var pods []corev1.Pod
+	if err != nil {
+		logrus.WithError(
+			err).WithField(
+			"namespace", query.Namespace).WithField(
+			"labelSelector", query.LabelSelector).Fatalf(
+			"Could list pods!")
+	}
 
-	if len(names) == 0 {
-		// all pods of the given namespace
-		list, err := kubeClient.Client.CoreV1().Pods(namespace).List(context.Background(), metav1.ListOptions{})
-
-		if err == nil {
-			pods = list.Items
+	for _, p := range list.Items {
+		if len(query.Names) > 0 && !util.Contains(query.Names, p.Name) {
+			continue
 		}
-	} else {
-		// the given pods in the given namespace
-		for _, p := range names {
-			pod, err := kubeClient.Client.CoreV1().Pods(namespace).Get(context.Background(), p, metav1.GetOptions{})
 
-			if err == nil {
-				pods = append(pods, *pod)
+		if len(query.AnnotationSelector) > 0 {
+			selectors := util.ParseSelector(query.AnnotationSelector)
+			fmt.Println(selectors)
+			matched := true
+			for _, selector := range selectors {
+				potentialValue := p.Annotations[selector.Key]
+				if selector.Operator == "=" {
+					matched = matched && potentialValue == selector.Value
+				} else if selector.Operator == "!=" {
+					matched = matched && potentialValue != selector.Value
+				} else if selector.Operator == "" {
+					matched = matched && potentialValue != ""
+				}
+			}
+
+			if !matched {
+				continue
 			}
 		}
+
+		pods = append(pods, p)
 	}
 
 	return pods

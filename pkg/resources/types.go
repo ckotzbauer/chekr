@@ -12,12 +12,13 @@ import (
 )
 
 type Resource struct {
-	Prometheus    prometheus.Prometheus
-	KubeOverrides *clientcmd.ConfigOverrides
-	KubeClient    *kubernetes.KubeClient
-	Pods          []string
-	Namespace     string
-	Selector      string
+	Prometheus         prometheus.Prometheus
+	KubeOverrides      *clientcmd.ConfigOverrides
+	KubeClient         *kubernetes.KubeClient
+	Pods               []string
+	Namespace          string
+	LabelSelector      string
+	AnnotationSelector string
 }
 
 type AnalyzedValues struct {

@@ -27,11 +27,12 @@ Standalone pod: If the pod is removed or crashes, it disappears without replacem
 `
 
 type HighAvailability struct {
-	KubeOverrides *clientcmd.ConfigOverrides
-	KubeClient    *kubernetes.KubeClient
-	Pods          []string
-	Namespace     string
-	Selector      string
+	KubeOverrides      *clientcmd.ConfigOverrides
+	KubeClient         *kubernetes.KubeClient
+	Pods               []string
+	Namespace          string
+	LabelSelector      string
+	AnnotationSelector string
 }
 
 type PodAvailability struct {

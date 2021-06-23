@@ -12,15 +12,17 @@ var haCmd = &cobra.Command{
 	Use:   "ha",
 	Short: "Creates high-availability report of your workload.",
 	Run: func(cmd *cobra.Command, args []string) {
-		selector, _ := cmd.Flags().GetString("selector")
+		labelSelector, _ := cmd.Flags().GetString("selector")
+		annotationSelector, _ := cmd.Flags().GetString("annotation")
 		namespace, _ := cmd.Flags().GetString("namespace")
 
 		r := ha.HighAvailability{
-			KubeOverrides: overrides,
-			KubeClient:    kubernetes.NewClient(cmd, overrides),
-			Pods:          args,
-			Selector:      selector,
-			Namespace:     namespace,
+			KubeOverrides:      overrides,
+			KubeClient:         kubernetes.NewClient(cmd, overrides),
+			Pods:               args,
+			LabelSelector:      labelSelector,
+			AnnotationSelector: annotationSelector,
+			Namespace:          namespace,
 		}
 
 		list := r.Execute()
@@ -36,5 +38,6 @@ var haCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(haCmd)
 	haCmd.Flags().StringP("selector", "l", "", "Label-Selector")
+	haCmd.Flags().StringP("annotation", "a", "", "Annotation-Selector")
 	// Output
 }
