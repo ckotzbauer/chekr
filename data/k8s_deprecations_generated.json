@@ -389,7 +389,7 @@
       {
         "name": "HorizontalPodAutoscaler",
         "introduced": "1.12",
-        "deprecated": "1.22",
+        "deprecated": "1.23",
         "removed": "",
         "replacement": {
           "group": "",
