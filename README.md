@@ -79,7 +79,8 @@ is detected. By default the namespace of the `kubeconfig context` is used for th
 ### High-availability
 
 This feature generates a report of all pods about their resiliency according their configuration.
-To change the default namespace use global `-n` flag. You can filter by pod-selectors with `-l`. All Pods are categorized by multiple factors:
+To change the default namespace use global `-n` flag. You can filter by label-pod-selectors with `-l` or by annotation key-value-pairs (splitted by a comma) with `-a`. 
+All Pods are categorized by multiple factors:
 * Type (Deployment, Statefulset, DaemonSet, Job, CRD, standalone)
 * Replica count
 * Deploymentstrategy / Updatestrategy
@@ -103,6 +104,7 @@ Usage:
   chekr ha [flags]
 
 Flags:
+  -a, --annotation string            Annotation-Selector
   -h, --help              help for ha
   -l, --selector string   Label-Selector
 
@@ -112,12 +114,14 @@ Flags:
 
 To generate a report about the resource-consumption from pods you can use this subcommand. It queries the given Prometheus server
 (`--prometheus-url` is mandatory) and compares the `Requests`, `Limits` and `Usage` metrics for memory and cpu of the last **30 days**.
-To change the default namespace use global `-n` flag and for the count of days `-d`. You can filter by pod-selectors with `-l`.
+To change the default namespace use global `-n` flag and for the count of days `-d`. You can filter by label-pod-selectors with `-l` or by annotation key-value-pairs (splitted by a comma) with `-a`.
 The `--timeout` duration applies to the Prometheus client. Stopped Pods are ignored automatically.
 
 [See used prometheus metrics](https://github.com/ckotzbauer/chekr/blob/master/pkg/resources/metrics.go)
 
 **Note:** You can specify a URL to any Promtheus-API-compliant application. Mostly *[Thanos](https://thanos.io/)* is notable here.
+You can either specify a HTTP(S) web-address or the name of the pod, its namespace and optional its port in the form `namespace/pod[:port]`. This will do
+a port-forward under the hood to fetch the data. When no port is specified, `9090` is used (the default Prometheus port).
 
 ```
 Analyze resource requests and limits of pods.
@@ -126,6 +130,7 @@ Usage:
   chekr resources [flags]
 
 Flags:
+  -a, --annotation string            Annotation-Selector
   -d, --count-days int               Count of days to analyze metrics from (until now). (default 30)
   -h, --help                         help for resources
   -P, --prometheus-password string   Prometheus-Password
@@ -140,7 +145,8 @@ Flags:
 To get an overview of api-objects in your cluster which are deprecated you can use this feature. It scans all objects and gives you a list
 of objects which are deprecated and will be removed in a future version. You can ignore kinds with `-i`. To only view deprecations until a given
 version you can specify `-V`. By default chekr will use the server-version of your cluster. This will hide all items, which are deprecated in 
-a never version than specified. Increase the burst with `-t` to bypass throttling from the Kubernetes server.
+a never version than specified. Increase the burst with `-t` to bypass throttling from the Kubernetes server. If deprecations were found, the command
+will exit with code `1` unless you specified the `--omit-exit-code` flag.
 
 **Note:** This command always scans all namespaces and cannot be filtered with the global `-n` flag.
 This feature was inspired by https://github.com/rikatz/kubepug.
@@ -155,6 +161,7 @@ Flags:
   -h, --help                    help for deprecation
   -i, --ignored-kinds strings   All kinds you want to ignore (e.g. Deployment,DaemonSet)
   -V, --k8s-version string      Highest K8s major.minor version to show deprecations for (e.g. 1.21)
+      --omit-exit-code          Omits the non-zero exit code if deprecations were found.
   -t, --throttle-burst int      Burst used for throttling of Kubernetes discovery-client (default 100)
 ```
 
