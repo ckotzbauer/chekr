@@ -16,13 +16,6 @@ import (
 )
 
 func (r Resource) Execute() printer.PrintableList {
-	v1api := r.Prometheus.InitPrometheus()
-	queryRange := v1.Range{
-		Start: time.Now().Add(-time.Hour * 24 * time.Duration(r.Prometheus.CountDays)),
-		End:   time.Now(),
-		Step:  time.Minute * 5,
-	}
-
 	pods := r.KubeClient.ListPods(kubernetes.PodQuery{
 		Namespace:          r.Namespace,
 		LabelSelector:      r.LabelSelector,
@@ -30,13 +23,48 @@ func (r Resource) Execute() printer.PrintableList {
 		AnnotationSelector: r.AnnotationSelector,
 	})
 
+	if len(pods) == 0 {
+		return PodValuesList{}
+	}
+
+	if kubernetes.IsResourceName(r.Prometheus.Url) {
+		readyChannel := make(chan struct{})
+		stopChannel := make(chan struct{}, 1)
+
+		fn := func() PodValuesList {
+			<-readyChannel
+			x := r.executeInternal(pods)
+			close(stopChannel)
+			return x
+		}
+
+		ch := channelify.Channelify(fn)
+		c := ch.(func() chan PodValuesList)()
+		r.KubeClient.ForwardResource(&r.Prometheus, readyChannel, stopChannel)
+
+		result := <-c
+		return result
+	} else {
+		return r.executeInternal(pods)
+	}
+}
+
+func (r Resource) executeInternal(pods []corev1.Pod) PodValuesList {
+	podValuesList := PodValuesList{Items: []PodValues{}}
+
+	v1api := r.Prometheus.InitPrometheus()
+	queryRange := v1.Range{
+		Start: time.Now().Add(-time.Hour * 24 * time.Duration(r.Prometheus.CountDays)),
+		End:   time.Now(),
+		Step:  time.Minute * 5,
+	}
+
 	fn1 := func(r Resource, pod corev1.Pod, v1api v1.API, queryRange v1.Range) printer.Printable {
 		return r.analyzePod(pod, v1api, queryRange)
 	}
 
 	ch1 := channelify.Channelify(fn1)
 	var channels [](chan printer.Printable)
-	podValuesList := PodValuesList{Items: []PodValues{}}
 
 	for _, pod := range pods {
 		if pod.Status.Phase == corev1.PodRunning {
