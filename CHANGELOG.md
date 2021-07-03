@@ -1,3 +1,34 @@
+## Version 0.3.0 (2021-07-03)
+
+### Features and improvements
+
+* [[`ef8c6203`](https://github.com/ckotzbauer&#x2F;chekr/commit/ef8c6203)] - **feat**: Updated Kubernetes deprecations
+* [[`aec69f7c`](https://github.com/ckotzbauer&#x2F;chekr/commit/aec69f7c)] - **feat**: add port-forwarding for prometheus-query url close #38
+* [[`376a462c`](https://github.com/ckotzbauer&#x2F;chekr/commit/376a462c)] - **feat**: filter by annotations close #42
+* [[`46dda87f`](https://github.com/ckotzbauer&#x2F;chekr/commit/46dda87f)] - **feat**: exit with error, if deprecations found close #49
+
+### Bug fixes
+
+* [[`f54c75ae`](https://github.com/ckotzbauer&#x2F;chekr/commit/f54c75ae)] - **fix**: quit on missing metrics
+
+### Cleanup and refactoring
+
+* [[`5fa0f015`](https://github.com/ckotzbauer&#x2F;chekr/commit/5fa0f015)] - **cleanup**: go mod tidy
+
+### Documentation
+
+* [[`4fed088f`](https://github.com/ckotzbauer&#x2F;chekr/commit/4fed088f)] - **doc**: updates for 0.3.0
+
+### Dependency updates
+
+* [[`a13384e7`](https://github.com/ckotzbauer&#x2F;chekr/commit/a13384e7)] - **deps**: update module github.com&#x2F;spf13&#x2F;cobra to v1.2.1 (#53)
+* [[`9a6b2180`](https://github.com/ckotzbauer&#x2F;chekr/commit/9a6b2180)] - **deps**: Bump actions&#x2F;setup-node from 2.1.5 to 2.2.0 (#52)
+* [[`49b07e55`](https://github.com/ckotzbauer&#x2F;chekr/commit/49b07e55)] - **deps**: update kubernetes versions to v0.21.2 (#50)
+* [[`e84f8229`](https://github.com/ckotzbauer&#x2F;chekr/commit/e84f8229)] - **deps**: update alpine docker tag to v3.14 (#51)
+* [[`e7a047fb`](https://github.com/ckotzbauer&#x2F;chekr/commit/e7a047fb)] - **deps**: update module github.com&#x2F;prometheus&#x2F;common to v0.29.0 (#48)
+* [[`2a9bb305`](https://github.com/ckotzbauer&#x2F;chekr/commit/2a9bb305)] - **deps**: update module github.com&#x2F;prometheus&#x2F;common to v0.27.0 (#46)
+
+
 ## Version 0.2.0 (2021-06-03)
 
 ### Features and improvements
