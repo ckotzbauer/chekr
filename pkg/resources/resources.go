@@ -121,6 +121,10 @@ func calculate(usageMetric, requestMetric, limitMetric *model.SampleStream, anal
 	var avgLimits float64
 	var avgLimitCounter float64
 
+	if usageMetric == nil || requestMetric == nil || limitMetric == nil {
+		return
+	}
+
 	for i := 0; i < len(usageMetric.Values); i++ {
 		usg := usageMetric.Values[i]
 		req := findPair(requestMetric.Values, usg.Timestamp)
