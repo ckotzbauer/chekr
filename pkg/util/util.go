@@ -11,11 +11,23 @@ import (
 )
 
 func (c ComputedValue) FormatMemory() string {
-	return fmt.Sprintf("%.2f", c.Percentage*100) + "% (" + ByteCountIEC(c.Value) + ")"
+	if c.Percentage == 0 {
+		return ByteCountIEC(c.Value)
+	} else {
+		return fmt.Sprintf("%.2f", c.Percentage*100) + "% (" + ByteCountIEC(c.Value) + ")"
+	}
 }
 
 func (c ComputedValue) FormatCPU() string {
-	return fmt.Sprintf("%.2f", c.Percentage*100) + "% (" + fmt.Sprintf("%.3f", c.Value) + " Cores)"
+	if c.Percentage == 0 {
+		return Cores(c.Value)
+	} else {
+		return fmt.Sprintf("%.2f", c.Percentage*100) + "% (" + Cores(c.Value) + ")"
+	}
+}
+
+func Cores(b float64) string {
+	return fmt.Sprintf("%.3f", b) + " Cores"
 }
 
 func ByteCountIEC(b float64) string {
@@ -90,4 +102,38 @@ func ParseSelector(selector string) []KeyValueSelector {
 	}
 
 	return selectors
+}
+
+func MinOf(vars ...float64) float64 {
+	min := vars[0]
+
+	for _, i := range vars {
+		if min > i || min == 0 {
+			min = i
+		}
+	}
+
+	return min
+}
+
+func MaxOf(vars ...float64) float64 {
+	max := vars[0]
+
+	for _, i := range vars {
+		if max < i {
+			max = i
+		}
+	}
+
+	return max
+}
+
+func SumOf(vars ...float64) float64 {
+	sum := 0.0
+
+	for _, i := range vars {
+		sum += i
+	}
+
+	return sum
 }

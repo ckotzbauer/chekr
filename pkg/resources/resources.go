@@ -4,6 +4,7 @@ import (
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/ckotzbauer/chekr/pkg/kubernetes"
 	"github.com/ckotzbauer/chekr/pkg/printer"
@@ -84,113 +85,80 @@ func (r Resource) executeInternal(pods []corev1.Pod) PodValuesList {
 
 func (r Resource) analyzePod(pod corev1.Pod, v1api v1.API, queryRange v1.Range) printer.Printable {
 	podValues := PodValues{
-		Namespace:      pod.Namespace,
-		Pod:            pod.Name,
-		MemoryRequests: AnalyzedValues{},
-		MemoryLimits:   AnalyzedValues{},
-		CPURequests:    AnalyzedValues{},
-		CPULimits:      AnalyzedValues{},
+		Namespace:  pod.Namespace,
+		Pod:        pod.Name,
+		Containers: []ContainerValue{},
 	}
 
-	matrix, err := queryMatrix(r.Prometheus, v1api, Metrics(pod.Namespace, pod.Name), queryRange)
+	matrix, err := queryMatrix(r.Prometheus, v1api, MetricsQuery(pod.Namespace, pod.Name), queryRange)
 
 	if err != nil {
 		logrus.WithError(err).WithField("pod", pod.Namespace+"/"+pod.Name).Fatalf("Could not query metrics for pod!")
 	}
 
-	calculate(
-		findMetric(matrix, MemoryUsageMetric),
-		findMetric(matrix, MemoryRequestsMetric),
-		findMetric(matrix, MemoryLimitsMetric),
-		&podValues.MemoryRequests,
-		&podValues.MemoryLimits)
+	for _, container := range pod.Spec.Containers {
+		cv := ContainerValue{
+			Name:           container.Name,
+			MemoryRequests: AnalyzedValues{},
+			MemoryLimits:   AnalyzedValues{},
+			CPURequests:    AnalyzedValues{},
+			CPULimits:      AnalyzedValues{},
+		}
 
-	calculate(
-		findMetric(matrix, CPUUsageMetric),
-		findMetric(matrix, CPURequestsMetric),
-		findMetric(matrix, CPULimitsMetric),
-		&podValues.CPURequests,
-		&podValues.CPULimits)
+		calculate(
+			MemoryUsageMetric(matrix, container.Name),
+			container.Resources.Requests.Memory(),
+			container.Resources.Limits.Memory(),
+			&cv.MemoryRequests,
+			&cv.MemoryLimits)
+
+		calculate(
+			CPUUsageMetric(matrix, container.Name),
+			container.Resources.Requests.Cpu(),
+			container.Resources.Limits.Cpu(),
+			&cv.CPURequests,
+			&cv.CPULimits)
+
+		podValues.Containers = append(podValues.Containers, cv)
+	}
 
 	return podValues
 }
 
-func calculate(usageMetric, requestMetric, limitMetric *model.SampleStream, analyzedRequests, analyzedLimits *AnalyzedValues) {
-	var avgRequests float64
-	var avgRequestCounter float64
-	var avgLimits float64
-	var avgLimitCounter float64
+func calculate(usageMetric *model.SampleStream, requests, limits *resource.Quantity, analyzedRequests, analyzedLimits *AnalyzedValues) {
+	var usages []float64
 
-	if usageMetric == nil || requestMetric == nil || limitMetric == nil {
+	if usageMetric == nil {
 		return
 	}
 
-	for i := 0; i < len(usageMetric.Values); i++ {
-		usg := usageMetric.Values[i]
-		req := findPair(requestMetric.Values, usg.Timestamp)
-		lim := findPair(limitMetric.Values, usg.Timestamp)
-
-		var requestPercentage float64
-		var limitPercentage float64
-
-		if req.Value != 0 {
-			requestPercentage = float64(usg.Value) / float64(req.Value)
-			avgRequests += requestPercentage
-			avgRequestCounter++
-		}
-
-		if lim.Value != 0 {
-			limitPercentage = float64(usg.Value) / float64(lim.Value)
-			avgLimits += limitPercentage
-			avgLimitCounter++
-		}
-
-		analyzedRequests.Min = computeMin(analyzedRequests.Min, requestPercentage, float64(usg.Value))
-		analyzedLimits.Min = computeMin(analyzedLimits.Min, limitPercentage, float64(usg.Value))
-		analyzedRequests.Max = computeMax(analyzedRequests.Max, requestPercentage, float64(usg.Value))
-		analyzedLimits.Max = computeMax(analyzedLimits.Max, limitPercentage, float64(usg.Value))
+	for _, usg := range usageMetric.Values {
+		usages = append(usages, float64(usg.Value))
 	}
 
-	if avgRequestCounter > 0 {
-		avg := avgRequests / avgRequestCounter
-		// TODO: fix average value
-		analyzedRequests.Avg = util.ComputedValue{Percentage: avg, Value: 0}
+	analyzedRequests.Min = util.ComputedValue{Value: util.MinOf(usages...)}
+	analyzedRequests.Max = util.ComputedValue{Value: util.MaxOf(usages...)}
+	analyzedRequests.Avg = util.ComputedValue{Value: util.SumOf(usages...) / float64(len(usageMetric.Values))}
+
+	if !requests.IsZero() {
+		analyzedRequests.Min.Percentage = analyzedRequests.Min.Value / requests.AsApproximateFloat64()
+		analyzedRequests.Max.Percentage = analyzedRequests.Max.Value / requests.AsApproximateFloat64()
+		analyzedRequests.Avg.Percentage = analyzedRequests.Avg.Value / requests.AsApproximateFloat64()
+		analyzedRequests.Current = requests.AsApproximateFloat64()
+		analyzedRequests.HasValue = true
 	}
 
-	if avgLimitCounter > 0 {
-		avg := avgLimits / avgLimitCounter
-		// TODO: fix average value
-		analyzedLimits.Avg = util.ComputedValue{Percentage: avg, Value: 0}
+	analyzedLimits.Min = util.ComputedValue{Value: analyzedRequests.Min.Value}
+	analyzedLimits.Max = util.ComputedValue{Value: analyzedRequests.Max.Value}
+	analyzedLimits.Avg = util.ComputedValue{Value: analyzedRequests.Avg.Value}
+
+	if !limits.IsZero() {
+		analyzedLimits.Min.Percentage = analyzedLimits.Min.Value / limits.AsApproximateFloat64()
+		analyzedLimits.Max.Percentage = analyzedLimits.Max.Value / limits.AsApproximateFloat64()
+		analyzedLimits.Avg.Percentage = analyzedLimits.Avg.Value / limits.AsApproximateFloat64()
+		analyzedLimits.Current = limits.AsApproximateFloat64()
+		analyzedLimits.HasValue = true
 	}
-}
-
-func findMetric(matrix model.Matrix, metric string) *model.SampleStream {
-	var potential []*model.SampleStream
-
-	for i := 0; i < matrix.Len(); i++ {
-		if string(matrix[i].Metric["__name__"]) == metric {
-			potential = append(potential, matrix[i])
-		}
-	}
-
-	for i := 0; i < len(potential); i++ {
-		if len(potential[i].Values) > 0 && float64(potential[i].Values[len(potential[i].Values)-1].Value) > 0 {
-			return potential[i]
-		}
-	}
-
-	return nil
-}
-
-func findPair(pairs []model.SamplePair, time model.Time) model.SamplePair {
-	for i := 0; i < len(pairs); i++ {
-		p := pairs[i]
-		if p.Timestamp == time {
-			return p
-		}
-	}
-
-	return model.SamplePair{}
 }
 
 func queryMatrix(prom prometheus.Prometheus, v1api v1.API, query string, r v1.Range) (model.Matrix, error) {
@@ -202,20 +170,4 @@ func queryMatrix(prom prometheus.Prometheus, v1api v1.API, query string, r v1.Ra
 
 	matrix := value.(model.Matrix)
 	return matrix, err
-}
-
-func computeMin(computed util.ComputedValue, current, value float64) util.ComputedValue {
-	if computed.Percentage < current && computed.Percentage != 0 {
-		return computed
-	}
-
-	return util.ComputedValue{Value: value, Percentage: current}
-}
-
-func computeMax(computed util.ComputedValue, current, value float64) util.ComputedValue {
-	if computed.Percentage > current {
-		return computed
-	}
-
-	return util.ComputedValue{Value: value, Percentage: current}
 }
