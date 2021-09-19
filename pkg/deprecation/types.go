@@ -12,7 +12,6 @@ import (
 type Deprecation struct {
 	KubeOverrides *clientcmd.ConfigOverrides
 	KubeClient    *kubernetes.KubeClient
-	Namespace     string
 	K8sVersion    string
 	IgnoredKinds  []string
 	ThrottleBurst int

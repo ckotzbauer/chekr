@@ -142,6 +142,8 @@ Flags:
 
 ### Deprecated API objects
 
+#### List deprecated API objects
+
 To get an overview of api-objects in your cluster which are deprecated you can use this feature. It scans all objects and gives you a list
 of objects which are deprecated and will be removed in a future version. You can ignore kinds with `-i`. To only view deprecations until a given
 version you can specify `-V`. By default chekr will use the server-version of your cluster. This will hide all items, which are deprecated in 
@@ -155,7 +157,7 @@ This feature was inspired by https://github.com/rikatz/kubepug.
 List deprected objects in your cluster.
 
 Usage:
-  chekr deprecation [flags]
+  chekr deprecation list [flags]
 
 Flags:
   -h, --help                    help for deprecation
