@@ -15,5 +15,7 @@ func init() {
 	rootCmd.AddCommand(deprecationCmd)
 
 	deprecation.InitListCmd(deprecationCmd, overrides)
+	deprecation.InitKyvernoCreateCmd(deprecationCmd, overrides)
+	deprecation.InitKyvernoDeleteCmd(deprecationCmd, overrides)
 	// Output
 }

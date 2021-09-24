@@ -10,11 +10,15 @@ import (
 )
 
 type Deprecation struct {
-	KubeOverrides *clientcmd.ConfigOverrides
-	KubeClient    *kubernetes.KubeClient
-	K8sVersion    string
-	IgnoredKinds  []string
-	ThrottleBurst int
+	KubeOverrides           *clientcmd.ConfigOverrides
+	KubeClient              *kubernetes.KubeClient
+	K8sVersion              string
+	IgnoredKinds            []string
+	ThrottleBurst           int
+	Category                string
+	Subject                 string
+	ValidationFailureAction string
+	Background              bool
 }
 
 type GroupVersion struct {

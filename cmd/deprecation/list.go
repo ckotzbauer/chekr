@@ -28,7 +28,7 @@ func createListCmd(overrides *clientcmd.ConfigOverrides) *cobra.Command {
 				ThrottleBurst: throttleBurst,
 			}
 
-			list := r.Execute()
+			list := r.ExecuteList()
 
 			output, _ := cmd.Flags().GetString("output")
 			outputFile, _ := cmd.Flags().GetString("output-file")
