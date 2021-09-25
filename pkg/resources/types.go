@@ -19,6 +19,8 @@ type Resource struct {
 	Namespace          string
 	LabelSelector      string
 	AnnotationSelector string
+	CpuMetric          string
+	MemoryMetric       string
 }
 
 type AnalyzedValues struct {

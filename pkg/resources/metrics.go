@@ -6,11 +6,6 @@ import (
 	"github.com/prometheus/common/model"
 )
 
-const (
-	memoryUsageMetric = "container_memory_working_set_bytes"
-	cpuUsageMetric    = "node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate"
-)
-
 type convert func(*model.SampleStream) bool
 
 func findMetric(matrix model.Matrix, name string, fn convert) *model.SampleStream {
@@ -30,18 +25,18 @@ func findMetric(matrix model.Matrix, name string, fn convert) *model.SampleStrea
 	return nil
 }
 
-func MemoryUsageMetric(matrix model.Matrix, container string) *model.SampleStream {
-	return findMetric(matrix, memoryUsageMetric, func(ss *model.SampleStream) bool {
+func (r Resource) MemoryUsageMetric(matrix model.Matrix, container string) *model.SampleStream {
+	return findMetric(matrix, r.MemoryMetric, func(ss *model.SampleStream) bool {
 		return ss.Metric["container"] == model.LabelValue(container)
 	})
 }
 
-func CPUUsageMetric(matrix model.Matrix, container string) *model.SampleStream {
-	return findMetric(matrix, cpuUsageMetric, func(ss *model.SampleStream) bool {
+func (r Resource) CPUUsageMetric(matrix model.Matrix, container string) *model.SampleStream {
+	return findMetric(matrix, r.CpuMetric, func(ss *model.SampleStream) bool {
 		return ss.Metric["container"] == model.LabelValue(container)
 	})
 }
 
-func MetricsQuery(namespace, pod string) string {
-	return fmt.Sprintf("{__name__=~\"node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate|container_memory_working_set_bytes\", namespace=\"%v\", pod=\"%v\", container!=\"\", container!=\"POD\"}", namespace, pod)
+func (r Resource) MetricsQuery(namespace, pod string) string {
+	return fmt.Sprintf("{__name__=~\"%v|%v\", namespace=\"%v\", pod=\"%v\", container!=\"\", container!=\"POD\"}", r.CpuMetric, r.MemoryMetric, namespace, pod)
 }

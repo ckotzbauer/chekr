@@ -90,7 +90,7 @@ func (r Resource) analyzePod(pod corev1.Pod, v1api v1.API, queryRange v1.Range) 
 		Containers: []ContainerValue{},
 	}
 
-	matrix, err := queryMatrix(r.Prometheus, v1api, MetricsQuery(pod.Namespace, pod.Name), queryRange)
+	matrix, err := queryMatrix(r.Prometheus, v1api, r.MetricsQuery(pod.Namespace, pod.Name), queryRange)
 
 	if err != nil {
 		logrus.WithError(err).WithField("pod", pod.Namespace+"/"+pod.Name).Fatalf("Could not query metrics for pod!")
@@ -106,14 +106,14 @@ func (r Resource) analyzePod(pod corev1.Pod, v1api v1.API, queryRange v1.Range) 
 		}
 
 		calculate(
-			MemoryUsageMetric(matrix, container.Name),
+			r.MemoryUsageMetric(matrix, container.Name),
 			container.Resources.Requests.Memory(),
 			container.Resources.Limits.Memory(),
 			&cv.MemoryRequests,
 			&cv.MemoryLimits)
 
 		calculate(
-			CPUUsageMetric(matrix, container.Name),
+			r.CPUUsageMetric(matrix, container.Name),
 			container.Resources.Requests.Cpu(),
 			container.Resources.Limits.Cpu(),
 			&cv.CPURequests,

@@ -25,6 +25,8 @@ var resourcesCmd = &cobra.Command{
 		labelSelector, _ := cmd.Flags().GetString("selector")
 		annotationSelector, _ := cmd.Flags().GetString("annotation")
 		namespace, _ := cmd.Flags().GetString("namespace")
+		cpuMetric, _ := cmd.Flags().GetString("cpu-metric")
+		memoryMetric, _ := cmd.Flags().GetString("memory-metric")
 
 		r := resources.Resource{
 			Prometheus: prometheus.Prometheus{
@@ -40,6 +42,8 @@ var resourcesCmd = &cobra.Command{
 			LabelSelector:      labelSelector,
 			AnnotationSelector: annotationSelector,
 			Namespace:          namespace,
+			CpuMetric:          cpuMetric,
+			MemoryMetric:       memoryMetric,
 		}
 
 		list := r.Execute()
@@ -57,6 +61,8 @@ func init() {
 	resourcesCmd.Flags().StringP("prometheus-url", "u", "", "Prometheus-URL")
 	resourcesCmd.Flags().StringP("prometheus-username", "U", "", "Prometheus-Username")
 	resourcesCmd.Flags().StringP("prometheus-password", "P", "", "Prometheus-Password")
+	resourcesCmd.Flags().String("cpu-metric", "node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate", "CPU-Usage metric to query")
+	resourcesCmd.Flags().String("memory-metric", "container_memory_working_set_bytes", "Memory-Usage metric to query")
 	resourcesCmd.Flags().Int64P("count-days", "d", 30, "Count of days to analyze metrics from (until now).")
 	resourcesCmd.Flags().DurationP("timeout", "t", time.Duration(30)*time.Second, "Timeout")
 
