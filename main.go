@@ -3,7 +3,7 @@ package main
 import "github.com/ckotzbauer/chekr/cmd"
 
 var (
-	version = "master"
+	version = "main"
 	commit  = "none"
 	date    = "unknown"
 	builtBy = "unknown"

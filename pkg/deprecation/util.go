@@ -21,7 +21,7 @@ func fetchDeprecatedApis() []GroupVersion {
 
 	err = util.DownloadFile(
 		file.Name(),
-		"https://raw.githubusercontent.com/ckotzbauer/chekr/master/data/k8s_deprecations_generated.json")
+		"https://raw.githubusercontent.com/ckotzbauer/chekr/main/data/k8s_deprecations_generated.json")
 
 	if err != nil {
 		logrus.WithError(err).Fatalf("Could not download deprecation-definition!")

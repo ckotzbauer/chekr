@@ -86,7 +86,7 @@ jobs:
         uses: ad-m/github-push-action@v0.6.0
         with:
           github_token: ${{ secrets.REPO_ACCESS }}
-          branch: master
+          branch: main
 
       - name: Create release
         uses: softprops/action-gh-release@v1

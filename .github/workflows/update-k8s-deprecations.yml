@@ -19,7 +19,7 @@ jobs:
         name: Checkout kubernetes/api
         with:
           repository: kubernetes/api
-          ref: master
+          ref: main
           path: tools/api-lifecycle-gen/api-repo
 
       - name: Generate

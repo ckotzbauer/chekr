@@ -118,7 +118,7 @@ To generate a report about the resource-consumption from pods you can use this s
 To change the default namespace use global `-n` flag and for the count of days `-d`. You can filter by label-pod-selectors with `-l` or by annotation key-value-pairs (splitted by a comma) with `-a`. To customize the queried metrics for cpu or memory, use the `--cpu-metric` and `--memory-metric` flags.
 The `--timeout` duration applies to the Prometheus client. Stopped Pods are ignored automatically.
 
-[See used prometheus metrics](https://github.com/ckotzbauer/chekr/blob/master/pkg/resources/metrics.go)
+[See used prometheus metrics](https://github.com/ckotzbauer/chekr/blob/main/pkg/resources/metrics.go)
 
 **Note:** You can specify a URL to any Promtheus-API-compliant application. Mostly *[Thanos](https://thanos.io/)* is notable here.
 You can either specify a HTTP(S) web-address or the name of the pod, its namespace and optional its port in the form `namespace/pod[:port]`. This will do
@@ -213,9 +213,9 @@ Flags:
 ```
 
 
-[Contributing](https://github.com/ckotzbauer/chekr/blob/master/CONTRIBUTING.md)
+[Contributing](https://github.com/ckotzbauer/chekr/blob/main/CONTRIBUTING.md)
 --------
-[License](https://github.com/ckotzbauer/chekr/blob/master/LICENSE)
+[License](https://github.com/ckotzbauer/chekr/blob/main/LICENSE)
 --------
-[Changelog](https://github.com/ckotzbauer/chekr/blob/master/CHANGELOG.md)
+[Changelog](https://github.com/ckotzbauer/chekr/blob/main/CHANGELOG.md)
 --------
