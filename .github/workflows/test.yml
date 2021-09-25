@@ -33,6 +33,7 @@ jobs:
       - name: Install GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
+          version: "v0.180.0"
           install-only: true
 
       - name: Build

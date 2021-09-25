@@ -1,3 +1,4 @@
+project_name: chekr
 before:
   hooks:
     - go mod tidy
