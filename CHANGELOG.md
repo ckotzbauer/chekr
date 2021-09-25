@@ -1,3 +1,45 @@
+## Version 0.4.0 (2021-09-25)
+
+### Features and improvements
+
+* [[`01fc7c20`](https://github.com/ckotzbauer&#x2F;chekr/commit/01fc7c20)] - **feat**: add metric config-option closes #32
+* [[`eff032ef`](https://github.com/ckotzbauer&#x2F;chekr/commit/eff032ef)] - **feat**: add kyverno subcommands
+* [[`0a8acf21`](https://github.com/ckotzbauer&#x2F;chekr/commit/0a8acf21)] - **feat**: move deprecation logic to &quot;deprecation list&quot;
+* [[`fcb8601b`](https://github.com/ckotzbauer&#x2F;chekr/commit/fcb8601b)] - **feat**: revamp of resources subcommand close #66
+
+### Cleanup and refactoring
+
+* [[`44d066b0`](https://github.com/ckotzbauer&#x2F;chekr/commit/44d066b0)] - **cleanup**: use better wording
+* [[`16d5fca5`](https://github.com/ckotzbauer&#x2F;chekr/commit/16d5fca5)] - **cleanup**: go.mod
+
+### Build and testing
+
+* [[`ded574b7`](https://github.com/ckotzbauer&#x2F;chekr/commit/ded574b7)] - **build**: pin and fix goreleaser
+
+### Documentation
+
+* [[`b9cb484f`](https://github.com/ckotzbauer&#x2F;chekr/commit/b9cb484f)] - **docs**: add new features
+
+### Dependency updates
+
+* [[`8f6ef045`](https://github.com/ckotzbauer&#x2F;chekr/commit/8f6ef045)] - **deps**: update kubernetes versions to v0.22.2 (#68)
+* [[`1244a62e`](https://github.com/ckotzbauer&#x2F;chekr/commit/1244a62e)] - **deps**: Bump pascalgn&#x2F;automerge-action from 0.14.2 to 0.14.3
+* [[`5a7a6594`](https://github.com/ckotzbauer&#x2F;chekr/commit/5a7a6594)] - **deps**: update to golang@1.17.0
+* [[`f611dc9c`](https://github.com/ckotzbauer&#x2F;chekr/commit/f611dc9c)] - **deps**: update kubernetes versions to v0.22.1 (#64)
+* [[`97f40537`](https://github.com/ckotzbauer&#x2F;chekr/commit/97f40537)] - **deps**: update kubernetes versions to v0.22.0 (#63)
+* [[`fd95b7a2`](https://github.com/ckotzbauer&#x2F;chekr/commit/fd95b7a2)] - **deps**: Bump actions&#x2F;setup-node from 2.3.2 to 2.4.0
+* [[`83332289`](https://github.com/ckotzbauer&#x2F;chekr/commit/83332289)] - **deps**: Bump actions&#x2F;setup-node from 2.3.1 to 2.3.2
+* [[`cb797956`](https://github.com/ckotzbauer&#x2F;chekr/commit/cb797956)] - **deps**: Bump actions&#x2F;setup-node from 2.3.0 to 2.3.1
+* [[`41caf56f`](https://github.com/ckotzbauer&#x2F;chekr/commit/41caf56f)] - **deps**: update module github.com&#x2F;prometheus&#x2F;common to v0.30.0 (#58)
+* [[`3f286ac7`](https://github.com/ckotzbauer&#x2F;chekr/commit/3f286ac7)] - **deps**: Bump actions&#x2F;setup-node from 2.2.0 to 2.3.0
+* [[`d6ade712`](https://github.com/ckotzbauer&#x2F;chekr/commit/d6ade712)] - **deps**: update kubernetes versions to v0.21.3 (#56)
+* [[`2f6b9f2f`](https://github.com/ckotzbauer&#x2F;chekr/commit/2f6b9f2f)] - **deps**: Bump actions&#x2F;stale from 3 to 4
+
+### Common changes
+
+* [[`98098366`](https://github.com/ckotzbauer&#x2F;chekr/commit/98098366)] - **chore**: Add FUNDING.yml
+
+
 ## Version 0.3.0 (2021-07-03)
 
 ### Features and improvements
