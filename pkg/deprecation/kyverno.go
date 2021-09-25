@@ -74,10 +74,10 @@ func (d Deprecation) createKyvernoPolicies(apis []GroupVersion) string {
 
 	for s, v := range m {
 		if s == "" {
-			s = "later"
+			s = "the future"
 		}
 
-		if s != "later" {
+		if s != "the future" {
 			if d.isVersionIgnored(s) {
 				continue
 			}
