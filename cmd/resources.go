@@ -9,6 +9,7 @@ import (
 	"github.com/ckotzbauer/chekr/pkg/resources"
 	"github.com/prometheus/common/config"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // resourcesCmd represents the resources command
@@ -16,17 +17,17 @@ var resourcesCmd = &cobra.Command{
 	Use:   "resources",
 	Short: "Analyze resource requests and limits of pods.",
 	Run: func(cmd *cobra.Command, args []string) {
-		url, _ := cmd.Flags().GetString("prometheus-url")
-		username, _ := cmd.Flags().GetString("prometheus-username")
-		password, _ := cmd.Flags().GetString("prometheus-password")
-		countDays, _ := cmd.Flags().GetInt64("count-days")
-		timeout, _ := cmd.Flags().GetDuration("timeout")
+		url := viper.GetString("prometheus-url")
+		username := viper.GetString("prometheus-username")
+		password := viper.GetString("prometheus-password")
+		countDays := viper.GetInt64("count-days")
+		timeout := viper.GetDuration("timeout")
 
-		labelSelector, _ := cmd.Flags().GetString("selector")
-		annotationSelector, _ := cmd.Flags().GetString("annotation")
-		namespace, _ := cmd.Flags().GetString("namespace")
-		cpuMetric, _ := cmd.Flags().GetString("cpu-metric")
-		memoryMetric, _ := cmd.Flags().GetString("memory-metric")
+		labelSelector := viper.GetString("selector")
+		annotationSelector := viper.GetString("annotation")
+		namespace := viper.GetString("namespace")
+		cpuMetric := viper.GetString("cpu-metric")
+		memoryMetric := viper.GetString("memory-metric")
 
 		r := resources.Resource{
 			Prometheus: prometheus.Prometheus{
@@ -36,7 +37,6 @@ var resourcesCmd = &cobra.Command{
 				CountDays: countDays,
 				Timeout:   timeout,
 			},
-			KubeOverrides:      overrides,
 			KubeClient:         kubernetes.NewClient(cmd, overrides),
 			Pods:               args,
 			LabelSelector:      labelSelector,
@@ -48,8 +48,8 @@ var resourcesCmd = &cobra.Command{
 
 		list := r.Execute()
 
-		output, _ := cmd.Flags().GetString("output")
-		outputFile, _ := cmd.Flags().GetString("output-file")
+		output := viper.GetString("output")
+		outputFile := viper.GetString("output-file")
 
 		printer := printer.Printer{Type: output, File: outputFile}
 		printer.Print(list)
@@ -65,9 +65,17 @@ func init() {
 	resourcesCmd.Flags().String("memory-metric", "container_memory_working_set_bytes", "Memory-Usage metric to query")
 	resourcesCmd.Flags().Int64P("count-days", "d", 30, "Count of days to analyze metrics from (until now).")
 	resourcesCmd.Flags().DurationP("timeout", "t", time.Duration(30)*time.Second, "Timeout")
-
 	resourcesCmd.Flags().StringP("selector", "l", "", "Label-Selector")
 	resourcesCmd.Flags().StringP("annotation", "a", "", "Annotation-Selector")
-
 	resourcesCmd.MarkFlagRequired("prometheus-url")
+
+	viper.BindPFlag("prometheus-url", haCmd.Flags().Lookup("prometheus-url"))
+	viper.BindPFlag("prometheus-username", haCmd.Flags().Lookup("prometheus-username"))
+	viper.BindPFlag("prometheus-password", haCmd.Flags().Lookup("prometheus-password"))
+	viper.BindPFlag("cpu-metric", haCmd.Flags().Lookup("cpu-metric"))
+	viper.BindPFlag("memory-metric", haCmd.Flags().Lookup("memory-metric"))
+	viper.BindPFlag("count-days", haCmd.Flags().Lookup("count-days"))
+	viper.BindPFlag("timeout", haCmd.Flags().Lookup("timeout"))
+	viper.BindPFlag("selector", haCmd.Flags().Lookup("selector"))
+	viper.BindPFlag("annotation", haCmd.Flags().Lookup("annotation"))
 }

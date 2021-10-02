@@ -14,8 +14,7 @@ func createKyvernoDeleteCmd(overrides *clientcmd.ConfigOverrides) *cobra.Command
 		Short: "Deletes Kyverno validation policies for deprecated objects in cluster.",
 		Run: func(cmd *cobra.Command, args []string) {
 			r := deprecation.Deprecation{
-				KubeOverrides: overrides,
-				KubeClient:    kubernetes.NewClient(cmd, overrides),
+				KubeClient: kubernetes.NewClient(cmd, overrides),
 			}
 
 			r.DeletePolicy()

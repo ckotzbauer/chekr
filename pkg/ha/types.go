@@ -7,7 +7,6 @@ import (
 	"github.com/ckotzbauer/chekr/pkg/kubernetes"
 	"github.com/ckotzbauer/chekr/pkg/printer"
 	"github.com/olekukonko/tablewriter"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 var description = `
@@ -27,7 +26,6 @@ Standalone pod: If the pod is removed or crashes, it disappears without replacem
 `
 
 type HighAvailability struct {
-	KubeOverrides      *clientcmd.ConfigOverrides
 	KubeClient         *kubernetes.KubeClient
 	Pods               []string
 	Namespace          string

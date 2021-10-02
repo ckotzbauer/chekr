@@ -8,12 +8,10 @@ import (
 	"github.com/ckotzbauer/chekr/pkg/prometheus"
 	"github.com/ckotzbauer/chekr/pkg/util"
 	"github.com/olekukonko/tablewriter"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 type Resource struct {
 	Prometheus         prometheus.Prometheus
-	KubeOverrides      *clientcmd.ConfigOverrides
 	KubeClient         *kubernetes.KubeClient
 	Pods               []string
 	Namespace          string

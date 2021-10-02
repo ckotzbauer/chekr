@@ -15,6 +15,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -54,6 +55,7 @@ func BindFlags(flags *pflag.FlagSet) *clientcmd.ConfigOverrides {
 	cmd := &clientcmd.ConfigOverrides{}
 	overrides := clientcmd.RecommendedConfigOverrideFlags("")
 	clientcmd.BindOverrideFlags(cmd, flags, overrides)
+	viper.BindPFlags(flags)
 	return cmd
 }
 

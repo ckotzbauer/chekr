@@ -5,6 +5,7 @@ import (
 	"github.com/ckotzbauer/chekr/pkg/kubernetes"
 	"github.com/ckotzbauer/chekr/pkg/printer"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // haCmd represents the ha command
@@ -12,12 +13,11 @@ var haCmd = &cobra.Command{
 	Use:   "ha",
 	Short: "Creates high-availability report of your workload.",
 	Run: func(cmd *cobra.Command, args []string) {
-		labelSelector, _ := cmd.Flags().GetString("selector")
-		annotationSelector, _ := cmd.Flags().GetString("annotation")
-		namespace, _ := cmd.Flags().GetString("namespace")
+		labelSelector := viper.GetString("selector")
+		annotationSelector := viper.GetString("annotation")
+		namespace := viper.GetString("namespace")
 
 		r := ha.HighAvailability{
-			KubeOverrides:      overrides,
 			KubeClient:         kubernetes.NewClient(cmd, overrides),
 			Pods:               args,
 			LabelSelector:      labelSelector,
@@ -27,8 +27,8 @@ var haCmd = &cobra.Command{
 
 		list := r.Execute()
 
-		output, _ := cmd.Flags().GetString("output")
-		outputFile, _ := cmd.Flags().GetString("output-file")
+		output := viper.GetString("output")
+		outputFile := viper.GetString("output-file")
 
 		printer := printer.Printer{Type: output, File: outputFile}
 		printer.Print(list)
@@ -39,5 +39,7 @@ func init() {
 	rootCmd.AddCommand(haCmd)
 	haCmd.Flags().StringP("selector", "l", "", "Label-Selector")
 	haCmd.Flags().StringP("annotation", "a", "", "Annotation-Selector")
-	// Output
+
+	viper.BindPFlag("selector", haCmd.Flags().Lookup("selector"))
+	viper.BindPFlag("annotation", haCmd.Flags().Lookup("annotation"))
 }

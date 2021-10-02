@@ -7,6 +7,7 @@ import (
 	"github.com/ckotzbauer/chekr/pkg/kubernetes"
 	"github.com/ckotzbauer/chekr/pkg/printer"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
@@ -16,12 +17,11 @@ func createListCmd(overrides *clientcmd.ConfigOverrides) *cobra.Command {
 		Use:   "list",
 		Short: "Lists deprecated objects in cluster.",
 		Run: func(cmd *cobra.Command, args []string) {
-			k8sVersion, _ := cmd.Flags().GetString("k8s-version")
-			ignoredKinds, _ := cmd.Flags().GetStringSlice("ignored-kinds")
-			throttleBurst, _ := cmd.Flags().GetInt("throttle-burst")
+			k8sVersion := viper.GetString("k8s-version")
+			ignoredKinds := viper.GetStringSlice("ignored-kinds")
+			throttleBurst := viper.GetInt("throttle-burst")
 
 			r := deprecation.Deprecation{
-				KubeOverrides: overrides,
 				KubeClient:    kubernetes.NewClient(cmd, overrides),
 				K8sVersion:    k8sVersion,
 				IgnoredKinds:  ignoredKinds,
@@ -30,9 +30,9 @@ func createListCmd(overrides *clientcmd.ConfigOverrides) *cobra.Command {
 
 			list := r.ExecuteList()
 
-			output, _ := cmd.Flags().GetString("output")
-			outputFile, _ := cmd.Flags().GetString("output-file")
-			omitExitCode, _ := cmd.Flags().GetBool("omit-exit-code")
+			output := viper.GetString("output")
+			outputFile := viper.GetString("output-file")
+			omitExitCode := viper.GetBool("omit-exit-code")
 
 			printer := printer.Printer{Type: output, File: outputFile}
 			printer.Print(list)
@@ -48,6 +48,11 @@ func createListCmd(overrides *clientcmd.ConfigOverrides) *cobra.Command {
 	listCmd.Flags().StringSliceP("ignored-kinds", "i", []string{}, "All kinds you want to ignore (e.g. Deployment,DaemonSet)")
 	listCmd.Flags().Bool("omit-exit-code", false, "Omits the non-zero exit code if deprecations were found.")
 	listCmd.Flags().IntP("throttle-burst", "t", 100, "Burst used for throttling of Kubernetes discovery-client")
+
+	viper.BindPFlag("k8s-version", listCmd.Flags().Lookup("k8s-version"))
+	viper.BindPFlag("ignored-kinds", listCmd.Flags().Lookup("ignored-kinds"))
+	viper.BindPFlag("omit-exit-code", listCmd.Flags().Lookup("omit-exit-code"))
+	viper.BindPFlag("throttle-burst", listCmd.Flags().Lookup("throttle-burst"))
 	return listCmd
 }
 

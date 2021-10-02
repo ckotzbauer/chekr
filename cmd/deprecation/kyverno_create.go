@@ -6,6 +6,7 @@ import (
 	"github.com/ckotzbauer/chekr/pkg/deprecation"
 	"github.com/ckotzbauer/chekr/pkg/kubernetes"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
@@ -15,7 +16,7 @@ func createKyvernoCreateCmd(overrides *clientcmd.ConfigOverrides) *cobra.Command
 		Use:   "kyverno-create",
 		Short: "Creates Kyverno validation policies for deprecated objects in cluster.",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			output, _ := cmd.Flags().GetString("output")
+			output := viper.GetString("output")
 
 			if output != "yaml" && output != "json" {
 				return fmt.Errorf("Output-Format not valid: %v", output)
@@ -24,15 +25,14 @@ func createKyvernoCreateCmd(overrides *clientcmd.ConfigOverrides) *cobra.Command
 			return nil
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			k8sVersion, _ := cmd.Flags().GetString("k8s-version")
-			ignoredKinds, _ := cmd.Flags().GetStringSlice("ignored-kinds")
-			category, _ := cmd.Flags().GetString("category")
-			subject, _ := cmd.Flags().GetString("subject")
-			validationFailureAction, _ := cmd.Flags().GetString("validation-failure-action")
-			background, _ := cmd.Flags().GetBool("background")
+			k8sVersion := viper.GetString("k8s-version")
+			ignoredKinds := viper.GetStringSlice("ignored-kinds")
+			category := viper.GetString("category")
+			subject := viper.GetString("subject")
+			validationFailureAction := viper.GetString("validation-failure-action")
+			background := viper.GetBool("background")
 
 			r := deprecation.Deprecation{
-				KubeOverrides:           overrides,
 				KubeClient:              kubernetes.NewClient(cmd, overrides),
 				K8sVersion:              k8sVersion,
 				IgnoredKinds:            ignoredKinds,
@@ -45,9 +45,9 @@ func createKyvernoCreateCmd(overrides *clientcmd.ConfigOverrides) *cobra.Command
 			policyCrd := r.ExecuteKyvernoCreate()
 			stringOutput := policyCrd
 
-			output, _ := cmd.Flags().GetString("output")
-			outputFile, _ := cmd.Flags().GetString("output-file")
-			dryRun, _ := cmd.Flags().GetBool("dry-run")
+			output := viper.GetString("output")
+			outputFile := viper.GetString("output-file")
+			dryRun := viper.GetBool("dry-run")
 
 			r.HandleKyvernoResult(stringOutput, output, outputFile, dryRun)
 		},
@@ -61,6 +61,14 @@ func createKyvernoCreateCmd(overrides *clientcmd.ConfigOverrides) *cobra.Command
 	kyvernoCreateCmd.Flags().String("validation-failure-action", "audit", "Validation-Failure-Action of the policy (audit or failure).")
 	kyvernoCreateCmd.Flags().Bool("background", true, "Whether background scans should be performed.")
 	kyvernoCreateCmd.Flags().Bool("dry-run", false, "Whether or not the generated policy should be applied.")
+
+	viper.BindPFlag("k8s-version", kyvernoCreateCmd.Flags().Lookup("k8s-version"))
+	viper.BindPFlag("ignored-kinds", kyvernoCreateCmd.Flags().Lookup("ignored-kinds"))
+	viper.BindPFlag("category", kyvernoCreateCmd.Flags().Lookup("category"))
+	viper.BindPFlag("k8s-subject", kyvernoCreateCmd.Flags().Lookup("subject"))
+	viper.BindPFlag("validation-failure-action", kyvernoCreateCmd.Flags().Lookup("validation-failure-action"))
+	viper.BindPFlag("background", kyvernoCreateCmd.Flags().Lookup("background"))
+	viper.BindPFlag("dry-run", kyvernoCreateCmd.Flags().Lookup("dry-run"))
 	return kyvernoCreateCmd
 }
 

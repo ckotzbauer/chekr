@@ -6,11 +6,9 @@ import (
 	"github.com/ckotzbauer/chekr/pkg/kubernetes"
 	"github.com/ckotzbauer/chekr/pkg/printer"
 	"github.com/olekukonko/tablewriter"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 type Deprecation struct {
-	KubeOverrides           *clientcmd.ConfigOverrides
 	KubeClient              *kubernetes.KubeClient
 	K8sVersion              string
 	IgnoredKinds            []string
