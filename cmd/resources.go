@@ -28,6 +28,8 @@ var resourcesCmd = &cobra.Command{
 		namespace := viper.GetString("namespace")
 		cpuMetric := viper.GetString("cpu-metric")
 		memoryMetric := viper.GetString("memory-metric")
+		limitsThreshold := viper.GetInt("limits-threshold")
+		requestsThreshold := viper.GetInt("requests-threshold")
 
 		r := resources.Resource{
 			Prometheus: prometheus.Prometheus{
@@ -44,6 +46,8 @@ var resourcesCmd = &cobra.Command{
 			Namespace:          namespace,
 			CpuMetric:          cpuMetric,
 			MemoryMetric:       memoryMetric,
+			LimitsThreshold:    limitsThreshold,
+			RequestsThreshold:  requestsThreshold,
 		}
 
 		list := r.Execute()
@@ -65,17 +69,21 @@ func init() {
 	resourcesCmd.Flags().String("memory-metric", "container_memory_working_set_bytes", "Memory-Usage metric to query")
 	resourcesCmd.Flags().Int64P("count-days", "d", 30, "Count of days to analyze metrics from (until now).")
 	resourcesCmd.Flags().DurationP("timeout", "t", time.Duration(30)*time.Second, "Timeout")
+	resourcesCmd.Flags().Int("limits-threshold", -1, "Only emit pods with a greater deviation of applied limits in average.")
+	resourcesCmd.Flags().Int("requests-threshold", -1, "Only emit pods with a greater deviation of applied requests in average.")
 	resourcesCmd.Flags().StringP("selector", "l", "", "Label-Selector")
 	resourcesCmd.Flags().StringP("annotation", "a", "", "Annotation-Selector")
 	resourcesCmd.MarkFlagRequired("prometheus-url")
 
-	viper.BindPFlag("prometheus-url", haCmd.Flags().Lookup("prometheus-url"))
-	viper.BindPFlag("prometheus-username", haCmd.Flags().Lookup("prometheus-username"))
-	viper.BindPFlag("prometheus-password", haCmd.Flags().Lookup("prometheus-password"))
-	viper.BindPFlag("cpu-metric", haCmd.Flags().Lookup("cpu-metric"))
-	viper.BindPFlag("memory-metric", haCmd.Flags().Lookup("memory-metric"))
-	viper.BindPFlag("count-days", haCmd.Flags().Lookup("count-days"))
-	viper.BindPFlag("timeout", haCmd.Flags().Lookup("timeout"))
-	viper.BindPFlag("selector", haCmd.Flags().Lookup("selector"))
-	viper.BindPFlag("annotation", haCmd.Flags().Lookup("annotation"))
+	viper.BindPFlag("prometheus-url", resourcesCmd.Flags().Lookup("prometheus-url"))
+	viper.BindPFlag("prometheus-username", resourcesCmd.Flags().Lookup("prometheus-username"))
+	viper.BindPFlag("prometheus-password", resourcesCmd.Flags().Lookup("prometheus-password"))
+	viper.BindPFlag("cpu-metric", resourcesCmd.Flags().Lookup("cpu-metric"))
+	viper.BindPFlag("memory-metric", resourcesCmd.Flags().Lookup("memory-metric"))
+	viper.BindPFlag("count-days", resourcesCmd.Flags().Lookup("count-days"))
+	viper.BindPFlag("timeout", resourcesCmd.Flags().Lookup("timeout"))
+	viper.BindPFlag("limits-threshold", resourcesCmd.Flags().Lookup("limits-threshold"))
+	viper.BindPFlag("requests-threshold", resourcesCmd.Flags().Lookup("requests-threshold"))
+	viper.BindPFlag("selector", resourcesCmd.Flags().Lookup("selector"))
+	viper.BindPFlag("annotation", resourcesCmd.Flags().Lookup("annotation"))
 }

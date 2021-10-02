@@ -19,6 +19,8 @@ type Resource struct {
 	AnnotationSelector string
 	CpuMetric          string
 	MemoryMetric       string
+	LimitsThreshold    int
+	RequestsThreshold  int
 }
 
 type AnalyzedValues struct {

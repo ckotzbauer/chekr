@@ -76,8 +76,13 @@ func (r Resource) executeInternal(pods []corev1.Pod) PodValuesList {
 
 	for _, v := range channels {
 		result := <-v
+		pv := result.(PodValues)
 
-		podValuesList.Items = append(podValuesList.Items, result.(PodValues))
+		if !shouldIncludePodRequests(pv, r.RequestsThreshold) || !shouldIncludePodLimits(pv, r.LimitsThreshold) {
+			continue
+		}
+
+		podValuesList.Items = append(podValuesList.Items, pv)
 	}
 
 	return podValuesList
@@ -170,4 +175,38 @@ func queryMatrix(prom prometheus.Prometheus, v1api v1.API, query string, r v1.Ra
 
 	matrix := value.(model.Matrix)
 	return matrix, err
+}
+
+func shouldIncludePodRequests(pv PodValues, threshold int) bool {
+	if threshold != -1 {
+		for _, c := range pv.Containers {
+			if (100+threshold) < int(c.CPURequests.Avg.Percentage*100) ||
+				(100-threshold) > int(c.CPURequests.Avg.Percentage*100) ||
+				(100+threshold) < int(c.MemoryRequests.Avg.Percentage*100) ||
+				(100-threshold) > int(c.MemoryRequests.Avg.Percentage*100) {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	return true
+}
+
+func shouldIncludePodLimits(pv PodValues, threshold int) bool {
+	if threshold != -1 {
+		for _, c := range pv.Containers {
+			if (100+threshold) < int(c.CPULimits.Avg.Percentage*100) ||
+				(100-threshold) > int(c.CPULimits.Avg.Percentage*100) ||
+				(100+threshold) < int(c.MemoryLimits.Avg.Percentage*100) ||
+				(100-threshold) > int(c.MemoryLimits.Avg.Percentage*100) {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	return true
 }
