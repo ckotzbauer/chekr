@@ -149,7 +149,7 @@ func calculate(usageMetric *model.SampleStream, requests, limits *resource.Quant
 		analyzedRequests.Min.Percentage = analyzedRequests.Min.Value / requests.AsApproximateFloat64()
 		analyzedRequests.Max.Percentage = analyzedRequests.Max.Value / requests.AsApproximateFloat64()
 		analyzedRequests.Avg.Percentage = analyzedRequests.Avg.Value / requests.AsApproximateFloat64()
-		analyzedRequests.Current = requests.AsApproximateFloat64()
+		analyzedRequests.Current = util.ComputedValue{Value: requests.AsApproximateFloat64(), Percentage: 0}
 		analyzedRequests.HasValue = true
 	}
 
@@ -161,7 +161,7 @@ func calculate(usageMetric *model.SampleStream, requests, limits *resource.Quant
 		analyzedLimits.Min.Percentage = analyzedLimits.Min.Value / limits.AsApproximateFloat64()
 		analyzedLimits.Max.Percentage = analyzedLimits.Max.Value / limits.AsApproximateFloat64()
 		analyzedLimits.Avg.Percentage = analyzedLimits.Avg.Value / limits.AsApproximateFloat64()
-		analyzedLimits.Current = limits.AsApproximateFloat64()
+		analyzedLimits.Current = util.ComputedValue{Value: limits.AsApproximateFloat64(), Percentage: 0}
 		analyzedLimits.HasValue = true
 	}
 }

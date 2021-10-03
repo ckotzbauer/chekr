@@ -27,7 +27,7 @@ type AnalyzedValues struct {
 	Min      util.ComputedValue
 	Max      util.ComputedValue
 	Avg      util.ComputedValue
-	Current  float64
+	Current  util.ComputedValue
 	HasValue bool
 }
 
@@ -85,7 +85,7 @@ func (p PodValuesList) ToTable() string {
 					v.Pod,
 					c.Name,
 					"Memory Requests",
-					util.ByteCountIEC(c.MemoryRequests.Current),
+					c.MemoryRequests.Current.FormatMemory(),
 					c.MemoryRequests.Min.FormatMemory(),
 					c.MemoryRequests.Avg.FormatMemory(),
 					c.MemoryRequests.Max.FormatMemory(),
@@ -109,7 +109,7 @@ func (p PodValuesList) ToTable() string {
 					v.Pod,
 					c.Name,
 					"Memory Limits",
-					util.ByteCountIEC(c.MemoryLimits.Current),
+					c.MemoryLimits.Current.FormatMemory(),
 					c.MemoryLimits.Min.FormatMemory(),
 					c.MemoryLimits.Avg.FormatMemory(),
 					c.MemoryLimits.Max.FormatMemory(),
@@ -133,7 +133,7 @@ func (p PodValuesList) ToTable() string {
 					v.Pod,
 					c.Name,
 					"CPU Requests",
-					util.Cores(c.CPURequests.Current),
+					c.CPURequests.Current.FormatCPU(),
 					c.CPURequests.Min.FormatCPU(),
 					c.CPURequests.Avg.FormatCPU(),
 					c.CPURequests.Max.FormatCPU(),
@@ -157,7 +157,7 @@ func (p PodValuesList) ToTable() string {
 					v.Pod,
 					c.Name,
 					"CPU Limits",
-					util.Cores(c.CPULimits.Current),
+					c.CPULimits.Current.FormatCPU(),
 					c.CPULimits.Min.FormatCPU(),
 					c.CPULimits.Avg.FormatCPU(),
 					c.CPULimits.Max.FormatCPU(),
