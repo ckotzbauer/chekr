@@ -28,7 +28,7 @@ func (p Printer) Print(list PrintableList) {
 
 	if p.File != "" {
 		data := []byte(out)
-		err := os.WriteFile(p.File, data, 0)
+		err := os.WriteFile(p.File, data, 0640)
 
 		if err != nil {
 			logrus.WithError(err).Fatalf("Could write output to file!")

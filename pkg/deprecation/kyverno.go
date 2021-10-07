@@ -127,7 +127,7 @@ func (d Deprecation) HandleKyvernoResult(stringOutput, output, outputFile string
 func printResult(str, outputFile string) {
 	if outputFile != "" {
 		data := []byte(str)
-		err := os.WriteFile(outputFile, data, 0)
+		err := os.WriteFile(outputFile, data, 0640)
 
 		if err != nil {
 			logrus.WithError(err).Fatalf("Could write output to file!")
