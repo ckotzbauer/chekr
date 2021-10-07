@@ -21,10 +21,6 @@ var (
 		Use:   "chekr",
 		Short: "A inspection utility for kubernetes-cluster maintenance.",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			if err := setUpLogs(os.Stdout, verbosity); err != nil {
-				return err
-			}
-
 			output := viper.GetString("output")
 
 			if output != "table" && output != "json" && output != "html" {
@@ -57,6 +53,10 @@ func init() {
 	viper.BindPFlag("output-file", rootCmd.PersistentFlags().Lookup("output-file"))
 	viper.BindPFlag(clientcmd.RecommendedConfigPathFlag, rootCmd.PersistentFlags().Lookup(clientcmd.RecommendedConfigPathFlag))
 	viper.BindPFlag("verbosity", rootCmd.PersistentFlags().Lookup("verbosity"))
+
+	if err := setUpLogs(os.Stdout, verbosity); err != nil {
+		fmt.Println(err)
+	}
 }
 
 func initConfig() {
