@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"time"
 
 	"github.com/ckotzbauer/chekr/pkg/kubernetes"
@@ -16,6 +17,15 @@ import (
 var resourcesCmd = &cobra.Command{
 	Use:   "resources",
 	Short: "Analyze resource requests and limits of pods.",
+	PreRunE: func(cmd *cobra.Command, args []string) error {
+		url := viper.GetString("prometheus-url")
+
+		if url == "" {
+			return errors.New("prometheus-url is mandatory")
+		}
+
+		return nil
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		url := viper.GetString("prometheus-url")
 		username := viper.GetString("prometheus-username")
@@ -73,7 +83,6 @@ func init() {
 	resourcesCmd.Flags().Int("requests-threshold", -1, "Only emit pods with a greater deviation of applied requests in average.")
 	resourcesCmd.Flags().StringP("selector", "l", "", "Label-Selector")
 	resourcesCmd.Flags().StringP("annotation", "a", "", "Annotation-Selector")
-	resourcesCmd.MarkFlagRequired("prometheus-url")
 
 	viper.BindPFlag("prometheus-url", resourcesCmd.Flags().Lookup("prometheus-url"))
 	viper.BindPFlag("prometheus-username", resourcesCmd.Flags().Lookup("prometheus-username"))
