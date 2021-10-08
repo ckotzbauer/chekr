@@ -3,7 +3,6 @@ package kubernetes
 import (
 	"context"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -230,23 +229,28 @@ func isVersionPreferred(group, currentVersion string, allGroups []*metav1.APIGro
 	return false
 }
 
-func IsResourceName(url string) bool {
+func ParseResourceName(url string) (string, string, string) {
 	r := regexp.MustCompile(`^([a-z-_0-9A-Z\.]+)\/([a-z-_0-9A-Z\.]+):?([0-9]{0,4})$`)
-	return r.MatchString(url)
+	if r.MatchString(url) {
+		groups := r.FindStringSubmatch(url)
+		namespace := groups[1]
+		name := groups[2]
+		var port string
+
+		if len(groups) > 3 && groups[3] != "" {
+			port = groups[3]
+		} else {
+			port = "9090"
+		}
+
+		return namespace, name, port
+	} else {
+		return "", "", ""
+	}
 }
 
 func (kubeClient *KubeClient) ForwardResource(prometheus *prometheus.Prometheus, readyChannel, stopChannel chan struct{}) {
-	r := regexp.MustCompile(`^([a-z-_0-9A-Z\.]+)\/([a-z-_0-9A-Z\.]+):?([0-9]{0,4})$`)
-	groups := r.FindStringSubmatch(prometheus.Url)
-	namespace := groups[1]
-	name := groups[2]
-	var port string
-
-	if len(groups) > 3 && groups[3] != "" {
-		port = groups[3]
-	} else {
-		port = "9090"
-	}
+	namespace, name, port := ParseResourceName(prometheus.Url)
 
 	opts := portforward.PortForwardOptions{
 		Namespace:    namespace,
@@ -262,14 +266,23 @@ func (kubeClient *KubeClient) ForwardResource(prometheus *prometheus.Prometheus,
 			prometheus: prometheus,
 			IOStreams: genericclioptions.IOStreams{
 				In:     os.Stdin,
-				Out:    io.Discard,
+				Out:    logrus.New().WriterLevel(logrus.DebugLevel),
 				ErrOut: logrus.New().WriterLevel(logrus.ErrorLevel),
 			},
 		},
 	}
 
-	opts.Validate()
-	opts.RunPortForward()
+	err := opts.Validate()
+
+	if err != nil {
+		logrus.WithError(err).Fatal("Validation for port-forward has failed!")
+	}
+
+	err = opts.RunPortForward()
+
+	if err != nil {
+		logrus.WithError(err).Fatal("Port-forward has failed!")
+	}
 }
 
 func (f *defaultPortForwarder) ForwardPorts(method string, url *url.URL, opts portforward.PortForwardOptions) error {

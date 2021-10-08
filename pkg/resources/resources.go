@@ -1,6 +1,7 @@
 package resources
 
 import (
+	"fmt"
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
@@ -28,7 +29,11 @@ func (r Resource) Execute() printer.PrintableList {
 		return PodValuesList{}
 	}
 
-	if kubernetes.IsResourceName(r.Prometheus.Url) {
+	namespace, name, port := kubernetes.ParseResourceName(r.Prometheus.Url)
+	isResourceName := namespace != "" && name != "" && port != ""
+
+	if isResourceName && !kubernetes.IsInCluster() {
+		// Call from local with a pod-resource as URL
 		readyChannel := make(chan struct{})
 		stopChannel := make(chan struct{}, 1)
 
@@ -45,9 +50,12 @@ func (r Resource) Execute() printer.PrintableList {
 
 		result := <-c
 		return result
-	} else {
-		return r.executeInternal(pods)
+	} else if isResourceName {
+		// Call from within the cluster, URL is a service-resource
+		r.Prometheus.Url = fmt.Sprintf("http://%v.%v.svc:%v", name, namespace, port)
 	}
+
+	return r.executeInternal(pods)
 }
 
 func (r Resource) executeInternal(pods []corev1.Pod) PodValuesList {
