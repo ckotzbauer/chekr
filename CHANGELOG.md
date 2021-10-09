@@ -1,3 +1,44 @@
+## Version 0.5.0 (2021-10-09)
+
+### Features and improvements
+
+* [[`e28f21be`](https://github.com/ckotzbauer&#x2F;chekr/commit/e28f21be)] - **feat**: add support for in-cluster svcs for resources-subcommand
+* [[`8b563016`](https://github.com/ckotzbauer&#x2F;chekr/commit/8b563016)] - **feat**: exclude pods by threshold on resources close #69
+* [[`d1123d0c`](https://github.com/ckotzbauer&#x2F;chekr/commit/d1123d0c)] - **feat**: improve config-system with viper close #40
+
+### Bug fixes
+
+* [[`318ac59f`](https://github.com/ckotzbauer&#x2F;chekr/commit/318ac59f)] - **fix**: handle mandatory param correctly
+* [[`fab3cdf9`](https://github.com/ckotzbauer&#x2F;chekr/commit/fab3cdf9)] - **fix**: move logging-init
+* [[`386ed834`](https://github.com/ckotzbauer&#x2F;chekr/commit/386ed834)] - **fix**: set correct file-permissions
+* [[`74651cc2`](https://github.com/ckotzbauer&#x2F;chekr/commit/74651cc2)] - **fix**: adjust resources html template
+
+### Cleanup and refactoring
+
+* [[`128ef476`](https://github.com/ckotzbauer&#x2F;chekr/commit/128ef476)] - **cleanup**: go mod tidy
+
+### Build and testing
+
+* [[`0ec7d4dc`](https://github.com/ckotzbauer&#x2F;chekr/commit/0ec7d4dc)] - **build**: ignore windows-arm builds
+
+### Documentation
+
+* [[`8c7903e6`](https://github.com/ckotzbauer&#x2F;chekr/commit/8c7903e6)] - **doc**: document changes
+
+### Dependency updates
+
+* [[`46ca14fe`](https://github.com/ckotzbauer&#x2F;chekr/commit/46ca14fe)] - **deps**: update module github.com&#x2F;spf13&#x2F;viper to v1.9.0
+* [[`fd5f5d7d`](https://github.com/ckotzbauer&#x2F;chekr/commit/fd5f5d7d)] - **deps**: update module github.com&#x2F;prometheus&#x2F;common to v0.31.1 (#72)
+* [[`240b1d04`](https://github.com/ckotzbauer&#x2F;chekr/commit/240b1d04)] - **deps**: Bump actions&#x2F;setup-node from 2.4.0 to 2.4.1
+* [[`ef34664e`](https://github.com/ckotzbauer&#x2F;chekr/commit/ef34664e)] - **deps**: update module github.com&#x2F;prometheus&#x2F;common to v0.31.0
+
+### Common changes
+
+* [[`ddbe62d5`](https://github.com/ckotzbauer&#x2F;chekr/commit/ddbe62d5)] - **chore**: added kind&#x2F;question label
+* [[`4504f69c`](https://github.com/ckotzbauer&#x2F;chekr/commit/4504f69c)] - **chore**: use main as default branch
+* [[`772d23e3`](https://github.com/ckotzbauer&#x2F;chekr/commit/772d23e3)] - **chore**: use label-command-action@v1
+
+
 ## Version 0.4.0 (2021-09-25)
 
 ### Features and improvements
