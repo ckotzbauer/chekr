@@ -45,6 +45,20 @@ docker run --rm \
     deprecation
 ```
 
+### Helm-Chart
+
+Install the [chekr-chart](https://github.com/ckotzbauer/helm-charts/tree/main/charts/chekr) into your cluster to run chekr-commands regularly and view their results as report.
+
+
+## Configuration
+
+Chekr uses the [viper](https://github.com/spf13/viper) library to do its configuration management. All flags can be configured in three different ways:
+- Config-File (`chekr.yaml` searched in the default path `$HOME/.config/chekr` or the current directory; can also be set with the global `--config` flag)
+- Environment-Variable (prefixed with `CHEKR_`)
+- CLI-Flags
+
+The CLI-Flags have the highest precedence.
+
 
 ## Usage
 
@@ -61,6 +75,7 @@ is detected. By default the namespace of the `kubeconfig context` is used for th
       --client-certificate string      Path to a client certificate file for TLS
       --client-key string              Path to a client key file for TLS
       --cluster string                 The name of the kubeconfig cluster to use
+  -c, --config string                  Path to the chekr config-file.
       --context string                 The name of the kubeconfig context to use
   -h, --help                           help for chekr
       --insecure-skip-tls-verify       If true, the server's certificate will not be checked for validity. This will make your HTTPS connections insecure
@@ -116,7 +131,8 @@ Flags:
 To generate a report about the resource-consumption from pods you can use this subcommand. It queries the given Prometheus server
 (`--prometheus-url` is mandatory) and compares the `Usage` metrics for memory and cpu of the last **30 days** with the the resource-requests and -limits.
 To change the default namespace use global `-n` flag and for the count of days `-d`. You can filter by label-pod-selectors with `-l` or by annotation key-value-pairs (splitted by a comma) with `-a`. To customize the queried metrics for cpu or memory, use the `--cpu-metric` and `--memory-metric` flags.
-The `--timeout` duration applies to the Prometheus client. Stopped Pods are ignored automatically.
+The `--timeout` duration applies to the Prometheus client. Stopped Pods are ignored automatically. To limit the output to pods whose average percental 
+requests (or limits) differ more than the given threshold you can add the `--requests-threshold` (or `--limits-threshold`) flag with a threshold value.
 
 [See used prometheus metrics](https://github.com/ckotzbauer/chekr/blob/main/pkg/resources/metrics.go)
 
@@ -135,10 +151,12 @@ Flags:
   -d, --count-days int               Count of days to analyze metrics from (until now). (default 30)
       --cpu-metric string            CPU-Usage metric to query (default "node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate")
   -h, --help                         help for resources
+      --limits-threshold int         Only emit pods with a greater deviation of applied limits in average. (default -1)
       --memory-metric string         Memory-Usage metric to query (default "container_memory_working_set_bytes")
   -P, --prometheus-password string   Prometheus-Password
   -u, --prometheus-url string        Prometheus-URL
   -U, --prometheus-username string   Prometheus-Username
+      --requests-threshold int       Only emit pods with a greater deviation of applied requests in average. (default -1)
   -l, --selector string              Label-Selector
   -t, --timeout duration             Timeout (default 30s)
 ```
