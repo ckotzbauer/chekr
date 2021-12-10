@@ -1,3 +1,27 @@
+## Version 0.5.1 (2021-12-10)
+
+### Bug fixes
+
+* [[`13556297`](https://github.com/ckotzbauer&#x2F;chekr/commit/13556297)] - **fix**: use master
+
+### Build and testing
+
+* [[`f0cdceaf`](https://github.com/ckotzbauer&#x2F;chekr/commit/f0cdceaf)] - **build**: update goreleaser
+* [[`ccdb3048`](https://github.com/ckotzbauer&#x2F;chekr/commit/ccdb3048)] - **build**: update to node@16
+
+### Dependency updates
+
+* [[`bf56768c`](https://github.com/ckotzbauer&#x2F;chekr/commit/bf56768c)] - **deps**: Bump actions&#x2F;setup-node from 2.4.1 to 2.5.0
+* [[`6b3694ba`](https://github.com/ckotzbauer&#x2F;chekr/commit/6b3694ba)] - **deps**: update kubernetes versions to v0.22.4 (#78)
+* [[`374c9e99`](https://github.com/ckotzbauer&#x2F;chekr/commit/374c9e99)] - **deps**: update alpine docker tag to v3.15 (#79)
+* [[`0a89ba1a`](https://github.com/ckotzbauer&#x2F;chekr/commit/0a89ba1a)] - **deps**: update kubernetes versions to v0.22.3 (#76)
+* [[`9803a591`](https://github.com/ckotzbauer&#x2F;chekr/commit/9803a591)] - **deps**: update module github.com&#x2F;prometheus&#x2F;common to v0.32.1
+
+### Common changes
+
+* [[`f0f660be`](https://github.com/ckotzbauer&#x2F;chekr/commit/f0f660be)] - **chore**: use other pull_request_target trigger
+
+
 ## Version 0.5.0 (2021-10-09)
 
 ### Features and improvements
