@@ -365,7 +365,7 @@
         "removed": "",
         "replacement": {
           "group": "autoscaling",
-          "version": "v2beta2",
+          "version": "v2",
           "name": "HorizontalPodAutoscaler"
         }
       },
@@ -392,9 +392,9 @@
         "deprecated": "1.23",
         "removed": "",
         "replacement": {
-          "group": "",
-          "version": "",
-          "name": ""
+          "group": "autoscaling",
+          "version": "v2",
+          "name": "HorizontalPodAutoscaler"
         }
       },
       {
@@ -732,7 +732,7 @@
         "removed": "1.21",
         "replacement": {
           "group": "flowcontrol.apiserver.k8s.io",
-          "version": "v1beta1",
+          "version": "v1beta2",
           "name": "FlowSchema"
         }
       },
@@ -743,7 +743,7 @@
         "removed": "1.21",
         "replacement": {
           "group": "flowcontrol.apiserver.k8s.io",
-          "version": "v1beta1",
+          "version": "v1beta2",
           "name": "FlowSchemaList"
         }
       },
@@ -754,7 +754,7 @@
         "removed": "1.21",
         "replacement": {
           "group": "flowcontrol.apiserver.k8s.io",
-          "version": "v1beta1",
+          "version": "v1beta2",
           "name": "PriorityLevelConfiguration"
         }
       },
@@ -765,7 +765,7 @@
         "removed": "1.21",
         "replacement": {
           "group": "flowcontrol.apiserver.k8s.io",
-          "version": "v1beta1",
+          "version": "v1beta2",
           "name": "PriorityLevelConfigurationList"
         }
       }
