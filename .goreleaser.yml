@@ -10,22 +10,47 @@ builds:
       - windows
       - darwin
     goarm:
-      - 6
-      - 7
+      - "6"
+      - "7"
     ignore:
       - goos: windows
         goarch: arm
     ldflags:
-      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}} -X main.builtBy=goreleaser
+      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.CommitDate}} -X main.builtBy=goreleaser
+    mod_timestamp: "{{.CommitTimestamp}}"
+    flags:
+      - -trimpath
+
 archives:
   - replacements:
       386: i386
     format_overrides:
       - goos: windows
         format: zip
+
+sboms:
+  - artifacts: archive
+    args: ["$artifact", "--file", "$document", "--output", "json"]
+
 snapshot:
   name_template: "{{ .Version }}"
+
 release:
   disable: true
+
 changelog:
   skip: true
+
+source:
+  enabled: true
+
+signs:
+  - cmd: cosign
+    certificate: '${artifact}.pem'
+    args:
+      - sign-blob
+      - '--output-certificate=${certificate}'
+      - '--output-signature=${signature}'
+      - '${artifact}'
+    artifacts: all
+    output: true
