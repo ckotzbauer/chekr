@@ -54,3 +54,4 @@ jobs:
         with:
           scan-target: ghcr.io/ckotzbauer/chekr:latest
           fail-on: "medium"
+          config-file: ".github/grype.yaml"
