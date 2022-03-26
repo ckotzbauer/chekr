@@ -1173,6 +1173,28 @@
           "version": "v1",
           "name": "CSINode"
         }
+      },
+      {
+        "name": "CSIStorageCapacity",
+        "introduced": "1.21",
+        "deprecated": "1.24",
+        "removed": "",
+        "replacement": {
+          "group": "storage.k8s.io",
+          "version": "v1",
+          "name": "CSIStorageCapacity"
+        }
+      },
+      {
+        "name": "CSIStorageCapacityList",
+        "introduced": "1.21",
+        "deprecated": "1.24",
+        "removed": "",
+        "replacement": {
+          "group": "storage.k8s.io",
+          "version": "v1",
+          "name": "CSIStorageCapacityList"
+        }
       }
     ]
   }
