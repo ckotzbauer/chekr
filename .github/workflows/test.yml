@@ -50,7 +50,7 @@ jobs:
           buildargs: TARGETOS=linux,TARGETARCH=amd64
 
       - name: Container scan
-        uses: ckotzbauer/actions-toolkit/grype@0.10.0
+        uses: ckotzbauer/actions-toolkit/grype@0.10.1
         with:
           scan-target: ghcr.io/ckotzbauer/chekr:latest
           fail-on: "medium"
