@@ -1,12 +1,17 @@
-FROM alpine:3.15
+FROM alpine:3.15@sha256:f22945d45ee2eb4dd463ed5a431d9f04fcd80ca768bb1acf898d91ce51f7bf04 as alpine
+
+ARG TARGETARCH
+
+RUN set -eux; \
+    apk add -U --no-cache ca-certificates
+
+
+FROM scratch
 
 ARG TARGETOS
 ARG TARGETARCH
 
-RUN addgroup -g 1000 chekr && \
-    adduser -u 1000 -G chekr -s /bin/sh -D chekr
-
+COPY --from=alpine /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY dist/chekr_${TARGETOS}_${TARGETARCH}/chekr /usr/local/bin/chekr
 
 ENTRYPOINT ["/usr/local/bin/chekr"]
-USER chekr
