@@ -52,6 +52,6 @@ jobs:
       - name: Container scan
         uses: ckotzbauer/actions-toolkit/grype@0.12.1
         with:
-          scan-target: ghcr.io/ckotzbauer/chekr:latest
+          scan-target: ckotzbauer/chekr:latest
           fail-on: "medium"
           config-file: ".github/grype.yaml"
