@@ -12,6 +12,6 @@ ARG TARGETOS
 ARG TARGETARCH
 
 COPY --from=alpine /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY dist/chekr_${TARGETOS}_${TARGETARCH}/chekr /usr/local/bin/chekr
+COPY dist/chekr_${TARGETOS}_${TARGETARCH}*/chekr /usr/local/bin/chekr
 
 ENTRYPOINT ["/usr/local/bin/chekr"]
