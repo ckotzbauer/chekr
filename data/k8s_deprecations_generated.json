@@ -732,7 +732,7 @@
         "removed": "1.21",
         "replacement": {
           "group": "flowcontrol.apiserver.k8s.io",
-          "version": "v1beta2",
+          "version": "v1beta3",
           "name": "FlowSchema"
         }
       },
@@ -743,7 +743,7 @@
         "removed": "1.21",
         "replacement": {
           "group": "flowcontrol.apiserver.k8s.io",
-          "version": "v1beta2",
+          "version": "v1beta3",
           "name": "FlowSchemaList"
         }
       },
@@ -754,7 +754,7 @@
         "removed": "1.21",
         "replacement": {
           "group": "flowcontrol.apiserver.k8s.io",
-          "version": "v1beta2",
+          "version": "v1beta3",
           "name": "PriorityLevelConfiguration"
         }
       },
@@ -765,7 +765,7 @@
         "removed": "1.21",
         "replacement": {
           "group": "flowcontrol.apiserver.k8s.io",
-          "version": "v1beta2",
+          "version": "v1beta3",
           "name": "PriorityLevelConfigurationList"
         }
       }
