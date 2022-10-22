@@ -67,6 +67,34 @@
     ]
   },
   {
+    "group": "apidiscovery.k8s.io",
+    "version": "v2beta1",
+    "resources": [
+      {
+        "name": "APIGroupDiscoveryList",
+        "introduced": "1.26",
+        "deprecated": "1.32",
+        "removed": "1.35",
+        "replacement": {
+          "group": "",
+          "version": "",
+          "name": ""
+        }
+      },
+      {
+        "name": "APIGroupDiscovery",
+        "introduced": "1.26",
+        "deprecated": "1.32",
+        "removed": "1.35",
+        "replacement": {
+          "group": "",
+          "version": "",
+          "name": ""
+        }
+      }
+    ]
+  },
+  {
     "group": "apps",
     "version": "v1beta1",
     "resources": [
