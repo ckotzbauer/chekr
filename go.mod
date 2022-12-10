@@ -108,4 +108,4 @@ require (
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
 
-replace github.com/ddelizia/channelify => github.com/ckotzbauer/channelify v0.0.2-0.20210225173251-a871a15779a0
+replace github.com/ddelizia/channelify => github.com/ckotzbauer/channelify v0.0.2-0.20201006072450-cc70777578df
