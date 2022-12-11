@@ -45,7 +45,7 @@ jobs:
             ghcr.io/ckotzbauer/chekr:latest
 
       - name: Container scan
-        uses: ckotzbauer/actions-toolkit/grype@0.26.0
+        uses: ckotzbauer/actions-toolkit/grype@0.27.0
         with:
           scan-target: ghcr.io/ckotzbauer/chekr:latest
           fail-on: "medium"
