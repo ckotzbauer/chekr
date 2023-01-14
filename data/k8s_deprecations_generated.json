@@ -704,28 +704,6 @@
         }
       },
       {
-        "name": "PodSecurityPolicy",
-        "introduced": "1.2",
-        "deprecated": "1.11",
-        "removed": "1.16",
-        "replacement": {
-          "group": "policy",
-          "version": "v1beta1",
-          "name": "PodSecurityPolicy"
-        }
-      },
-      {
-        "name": "PodSecurityPolicyList",
-        "introduced": "1.2",
-        "deprecated": "1.11",
-        "removed": "1.16",
-        "replacement": {
-          "group": "policy",
-          "version": "v1beta1",
-          "name": "PodSecurityPolicyList"
-        }
-      },
-      {
         "name": "NetworkPolicy",
         "introduced": "1.3",
         "deprecated": "1.9",
