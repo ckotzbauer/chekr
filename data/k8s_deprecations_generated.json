@@ -443,17 +443,6 @@
     "version": "v1beta1",
     "resources": [
       {
-        "name": "JobTemplate",
-        "introduced": "1.8",
-        "deprecated": "1.22",
-        "removed": "",
-        "replacement": {
-          "group": "",
-          "version": "",
-          "name": ""
-        }
-      },
-      {
         "name": "CronJob",
         "introduced": "1.8",
         "deprecated": "1.21",
