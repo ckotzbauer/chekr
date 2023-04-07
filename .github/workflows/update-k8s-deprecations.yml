@@ -26,7 +26,7 @@ jobs:
         run: make generate_k8s_deprecations
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v4
+        uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.REPO_ACCESS }}
           commit-message: "feat: Updated Kubernetes deprecations"
