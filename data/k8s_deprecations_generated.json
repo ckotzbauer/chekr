@@ -880,28 +880,6 @@
           "version": "",
           "name": ""
         }
-      },
-      {
-        "name": "PodSecurityPolicy",
-        "introduced": "1.10",
-        "deprecated": "1.21",
-        "removed": "1.25",
-        "replacement": {
-          "group": "",
-          "version": "",
-          "name": ""
-        }
-      },
-      {
-        "name": "PodSecurityPolicyList",
-        "introduced": "1.10",
-        "deprecated": "1.21",
-        "removed": "1.25",
-        "replacement": {
-          "group": "",
-          "version": "",
-          "name": ""
-        }
       }
     ]
   },
