@@ -717,56 +717,6 @@
     ]
   },
   {
-    "group": "flowcontrol.apiserver.k8s.io",
-    "version": "v1alpha1",
-    "resources": [
-      {
-        "name": "FlowSchema",
-        "introduced": "1.18",
-        "deprecated": "1.20",
-        "removed": "1.21",
-        "replacement": {
-          "group": "flowcontrol.apiserver.k8s.io",
-          "version": "v1beta3",
-          "name": "FlowSchema"
-        }
-      },
-      {
-        "name": "FlowSchemaList",
-        "introduced": "1.18",
-        "deprecated": "1.20",
-        "removed": "1.21",
-        "replacement": {
-          "group": "flowcontrol.apiserver.k8s.io",
-          "version": "v1beta3",
-          "name": "FlowSchemaList"
-        }
-      },
-      {
-        "name": "PriorityLevelConfiguration",
-        "introduced": "1.18",
-        "deprecated": "1.20",
-        "removed": "1.21",
-        "replacement": {
-          "group": "flowcontrol.apiserver.k8s.io",
-          "version": "v1beta3",
-          "name": "PriorityLevelConfiguration"
-        }
-      },
-      {
-        "name": "PriorityLevelConfigurationList",
-        "introduced": "1.18",
-        "deprecated": "1.20",
-        "removed": "1.21",
-        "replacement": {
-          "group": "flowcontrol.apiserver.k8s.io",
-          "version": "v1beta3",
-          "name": "PriorityLevelConfigurationList"
-        }
-      }
-    ]
-  },
-  {
     "group": "networking.k8s.io",
     "version": "v1beta1",
     "resources": [
